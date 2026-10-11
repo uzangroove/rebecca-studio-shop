@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#111111">
+  <title>ניהול · Rébecca Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <!-- ============ LOGIN ============ -->
+  <section id="login" class="login" hidden>
+    <div class="login-box">
+      <div class="mark">RÉBECCA</div>
+      <p class="muted">ניהול האתר</p>
+      <form id="loginForm">
+        <label>מייל<input type="email" name="email" autocomplete="username" required></label>
+        <label>סיסמה<input type="password" name="password" autocomplete="current-password" required></label>
+        <button class="btn solid wide" type="submit">כניסה</button>
+        <p class="msg" id="loginMsg" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ APP ============ -->
+  <div id="app" hidden>
+    <header class="top">
+      <div class="mark small">RÉBECCA</div>
+      <div class="top-actions">
+        <a class="chip" href="/" target="_blank" rel="noopener">לאתר ↗</a>
+        <button class="chip" id="logoutBtn" type="button">יציאה</button>
+      </div>
+    </header>
+
+    <main class="views">
+      <!-- products -->
+      <section class="view" data-view="products">
+        <div class="view-head">
+          <h1>מוצרים</h1>
+          <button class="btn solid" type="button" id="newProduct">+ מוצר חדש</button>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="prodSearch" placeholder="חיפוש…" aria-label="חיפוש מוצר">
+          <div class="chips" id="prodCats">
+            <button class="chip on" data-cat="all" type="button">הכל</button>
+            <button class="chip" data-cat="soap" type="button">סבונים</button>
+            <button class="chip" data-cat="candle" type="button">נרות</button>
+            <button class="chip" data-cat="bundle" type="button">מארזים</button>
+            <button class="chip" data-cat="other" type="button">עוד</button>
+          </div>
+        </div>
+        <div class="list" id="prodList"></div>
+      </section>
+
+      <!-- workshops -->
+      <section class="view" data-view="workshops" hidden>
+        <div class="view-head">
+          <h1>סדנאות</h1>
+          <button class="btn solid" type="button" id="newWorkshop">+ סדנה חדשה</button>
+        </div>
+        <p class="hint">סדנה בלי תאריך תופיע באתר כ"בתיאום אישי". רק סדנאות שמסומנות "מוצג באתר" נראות ללקוחות.</p>
+        <div class="list" id="wsList"></div>
+      </section>
+
+      <!-- signups -->
+      <section class="view" data-view="signups" hidden>
+        <div class="view-head">
+          <h1>הרשמות</h1>
+          <button class="btn" type="button" id="exportSignups">ייצוא לאקסל</button>
+        </div>
+        <div class="toolbar"><select id="signupFilter" aria-label="סינון לפי סדנה"><option value="">כל הסדנאות</option></select></div>
+        <div class="list" id="signupList"></div>
+      </section>
+
+      <!-- settings -->
+      <section class="view" data-view="settings" hidden>
+        <div class="view-head"><h1>הגדרות</h1></div>
+        <form id="settingsForm" class="form">
+          <fieldset><legend>יצירת קשר</legend>
+            <label>מספר וואטסאפ (פורמט בינלאומי, בלי +)<input name="whatsapp" inputmode="tel" placeholder="972535200728"></label>
+            <label>טלפון להצגה<input name="phone" inputmode="tel"></label>
+            <label>מייל<input name="email" type="email"></label>
+            <div class="two"><label>עיר (עברית)<input name="city_he"></label><label>City (English)<input name="city_en" dir="ltr"></label></div>
+          </fieldset>
+          <fieldset><legend>טקסטים באתר</legend>
+            <div class="two"><label>משפט פתיחה<input name="tagline_he"></label><label>Tagline<input name="tagline_en" dir="ltr"></label></div>
+            <label>אודות (עברית)<textarea name="about_he" rows="5"></textarea></label>
+            <label>About (English)<textarea name="about_en" rows="5" dir="ltr"></textarea></label>
+            <label>משלוחים ואיסוף<textarea name="shipping_he" rows="2"></textarea></label>
+            <label>Shipping (English)<textarea name="shipping_en" rows="2" dir="ltr"></textarea></label>
+            <label>תשלום<textarea name="payment_he" rows="2"></textarea></label>
+            <label>Payment (English)<textarea name="payment_en" rows="2" dir="ltr"></textarea></label>
+            <label>פתיח לסדנאות<textarea name="workshops_intro_he" rows="2"></textarea></label>
+            <label>Workshops intro (English)<textarea name="workshops_intro_en" rows="2" dir="ltr"></textarea></label>
+          </fieldset>
+          <fieldset><legend>הודעה בראש האתר (למשל מבצע חג)</legend>
+            <label>עברית<input name="announcement_he" placeholder="ריק = לא מוצג"></label>
+            <label>English<input name="announcement_en" dir="ltr"></label>
+          </fieldset>
+          <fieldset><legend>רשתות חברתיות (קישור מלא)</legend>
+            <label>Instagram<input name="instagram" type="url" dir="ltr" placeholder="https://instagram.com/…"></label>
+            <label>Facebook<input name="facebook" type="url" dir="ltr"></label>
+            <label>TikTok<input name="tiktok" type="url" dir="ltr"></label>
+          </fieldset>
+          <fieldset><legend>מראה</legend>
+            <label class="radio"><input type="radio" name="theme" value="mono"> שחור-לבן (כמו היום)</label>
+            <label class="radio"><input type="radio" name="theme" value="brand"> צבעי המותג: ירוק עמוק, זהב ושמנת</label>
+          </fieldset>
+          <button class="btn solid wide sticky-save" type="submit">שמירת הגדרות</button>
+        </form>
+
+        <div class="form">
+          <fieldset><legend>קישורים שימושיים</legend>
+            <div class="links">
+              <button class="btn" type="button" data-copy="/catalog/">העתקת קישור לקטלוג</button>
+              <button class="btn" type="button" data-wa-share="/catalog/">שליחת הקטלוג בוואטסאפ</button>
+              <button class="btn" type="button" data-copy="/feed.csv">קישור פיד מוצרים (פייסבוק/אינסטגרם)</button>
+            </div>
+          </fieldset>
+          <fieldset><legend>שינוי סיסמה</legend>
+            <form id="pwForm" class="inline-form">
+              <input type="password" name="pw" minlength="8" autocomplete="new-password" placeholder="סיסמה חדשה (8 תווים לפחות)" required>
+              <button class="btn" type="submit">עדכון</button>
+            </form>
+          </fieldset>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabs" aria-label="ניווט ניהול">
+      <button class="tab on" data-tab="products" type="button"><span class="ico">◻︎</span>מוצרים</button>
+      <button class="tab" data-tab="workshops" type="button"><span class="ico">✦</span>סדנאות</button>
+      <button class="tab" data-tab="signups" type="button"><span class="ico">✎</span>הרשמות <b class="dot" id="newSignups" hidden></b></button>
+      <button class="tab" data-tab="settings" type="button"><span class="ico">⚙︎</span>הגדרות</button>
+    </nav>
+  </div>
+
+  <!-- ============ PRODUCT EDITOR ============ -->
+  <dialog id="prodDlg" class="sheet">
+    <form id="prodForm" class="form" method="dialog">
+      <div class="sheet-head">
+        <button class="chip" type="button" data-close>ביטול</button>
+        <h2 id="prodDlgTitle">מוצר</h2>
+        <button class="btn solid" type="submit">שמירה</button>
+      </div>
+      <div class="sheet-body">
+        <div class="switches">
+          <label class="switch"><input type="checkbox" name="published"><span></span> מוצג באתר</label>
+          <label class="switch"><input type="checkbox" name="sold_out"><span></span> אזל זמנית</label>
+          <label class="switch"><input type="checkbox" name="featured"><span></span> מומלץ (מופיע ראשון)</label>
+        </div>
+        <fieldset><legend>תמונות (הראשונה היא הראשית)</legend>
+          <div class="img-grid" id="prodImgs"></div>
+          <label class="btn wide upload">+ הוספת תמונות מהגלריה או מהמצלמה
+            <input type="file" id="prodFiles" accept="image/*" multiple hidden>
+          </label>
+          <p class="hint" id="uploadMsg"></p>
+        </fieldset>
+        <label>קטגוריה
+          <select name="category" required>
+            <option value="soap">סבונים</option><option value="candle">נרות</option>
+            <option value="bundle">מארזים</option><option value="other">עוד</option>
+          </select>
+        </label>
+        <div class="two">
+          <label>מחיר (₪)<input name="price" type="number" min="0" step="0.5" inputmode="decimal" placeholder="ריק = מחיר בפנייה"></label>
+          <label>הערת מחיר<input name="price_note_he" placeholder="למשל: ל-100 גרם"></label>
+        </div>
+        <label>שם המוצר<input name="name_he" required maxlength="120"></label>
+        <label>תיאור קצר (שורה אחת בכרטיס)<input name="short_he" maxlength="200"></label>
+        <label>תיאור מלא (רכיבים, ניחוח, גודל)<textarea name="desc_he" rows="5" maxlength="4000"></textarea></label>
+        <details>
+          <summary>אנגלית (לא חובה — אם ריק, יוצג בעברית)</summary>
+          <label>Name<input name="name_en" dir="ltr" maxlength="120"></label>
+          <label>Short description<input name="short_en" dir="ltr" maxlength="200"></label>
+          <label>Full description<textarea name="desc_en" rows="4" dir="ltr" maxlength="4000"></textarea></label>
+          <label>Price note<input name="price_note_en" dir="ltr" maxlength="80"></label>
+        </details>
+        <details>
+          <summary>מתקדם</summary>
+          <label>כתובת המוצר (באנגלית, אותיות קטנות ומקפים)<input name="slug" dir="ltr" pattern="[a-z0-9-]{2,80}"></label>
+          <label>סדר הצגה (מספר קטן = מוקדם)<input name="sort_order" type="number" step="1"></label>
+        </details>
+        <button class="btn danger wide" type="button" id="prodDelete">מחיקת המוצר</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ============ WORKSHOP EDITOR ============ -->
+  <dialog id="wsDlg" class="sheet">
+    <form id="wsForm" class="form" method="dialog">
+      <div class="sheet-head">
+        <button class="chip" type="button" data-close>ביטול</button>
+        <h2 id="wsDlgTitle">סדנה</h2>
+        <button class="btn solid" type="submit">שמירה</button>
+      </div>
+      <div class="sheet-body">
+        <div class="switches"><label class="switch"><input type="checkbox" name="published"><span></span> מוצג באתר</label></div>
+        <fieldset><legend>תמונה</legend>
+          <div class="img-grid" id="wsImg"></div>
+          <label class="btn wide upload">+ בחירת תמונה<input type="file" id="wsFile" accept="image/*" hidden></label>
+        </fieldset>
+        <label>שם הסדנה<input name="title_he" required maxlength="120"></label>
+        <label>תיאור<textarea name="desc_he" rows="4" maxlength="4000"></textarea></label>
+        <div class="two">
+          <label>תאריך ושעה<input name="starts_at" type="datetime-local"></label>
+          <label>משך (דקות)<input name="duration_min" type="number" min="15" max="1440" step="15"></label>
+        </div>
+        <div class="two">
+          <label>מחיר למשתתף (₪)<input name="price" type="number" min="0" step="1"></label>
+          <label>מספר מקומות<input name="seats" type="number" min="1" max="500"></label>
+        </div>
+        <label>מיקום<input name="location_he" maxlength="160"></label>
+        <details>
+          <summary>אנגלית (לא חובה)</summary>
+          <label>Title<input name="title_en" dir="ltr"></label>
+          <label>Description<textarea name="desc_en" rows="3" dir="ltr"></textarea></label>
+          <label>Location<input name="location_en" dir="ltr"></label>
+        </details>
+        <button class="btn danger wide" type="button" id="wsDelete">מחיקת הסדנה</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ============ SHARE SHEET ============ -->
+  <dialog id="shareDlg" class="sheet">
+    <div class="form">
+      <div class="sheet-head">
+        <button class="chip" type="button" data-close>סגירה</button>
+        <h2>שיתוף ופרסום</h2><span></span>
+      </div>
+      <div class="sheet-body">
+        <p class="share-name" id="shareName"></p>
+        <fieldset><legend>קישור למוצר</legend>
+          <div class="links">
+            <button class="btn" type="button" id="shCopyLink">העתקת קישור</button>
+            <a class="btn" id="shWa" target="_blank" rel="noopener">שליחה בוואטסאפ</a>
+            <a class="btn" id="shFb" target="_blank" rel="noopener">שיתוף בפייסבוק</a>
+          </div>
+        </fieldset>
+        <fieldset><legend>טקסט מוכן לפוסט</legend>
+          <textarea id="shCaption" rows="7"></textarea>
+          <button class="btn" type="button" id="shCopyCaption">העתקת הטקסט</button>
+        </fieldset>
+        <fieldset><legend>תמונה ממותגת לאינסטגרם ולסטטוס</legend>
+          <div class="chips">
+            <button class="chip on" type="button" data-fmt="square">פוסט 1:1</button>
+            <button class="chip" type="button" data-fmt="story">סטורי/סטטוס 9:16</button>
+          </div>
+          <canvas id="shCanvas" width="1080" height="1080"></canvas>
+          <div class="links">
+            <button class="btn solid" type="button" id="shDownload">הורדת התמונה</button>
+            <button class="btn" type="button" id="shShareImg">שיתוף התמונה</button>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

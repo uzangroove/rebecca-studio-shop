@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="he" dir="rtl" data-theme="mono">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>קטלוג · Rébecca Studio</title>
+  <meta name="description" content="קטלוג המוצרים של Rébecca Studio — סבונים ונרות בעבודת יד.">
+  <meta property="og:title" content="קטלוג Rébecca Studio">
+  <meta property="og:description" content="סבונים, נרות ומארזי מתנה בעבודת יד מכרמיאל">
+  <meta property="og:image" content="/images/brand/og-cover.jpg">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <style>
+    body { padding: 0; background: #ececec; }
+    .toolbar { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 12px; background: var(--bg); border-bottom: 1px solid var(--line); }
+    .toolbar select { width: auto; }
+    .page { width: 210mm; margin: 16px auto; background: var(--bg); padding: 14mm 12mm; box-shadow: 0 4px 24px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+    .cat-head { text-align: center; border-bottom: 1px solid var(--line); padding-bottom: 8mm; margin-bottom: 8mm; }
+    .cat-head .m { font-family: var(--f-display); font-size: 46px; letter-spacing: .1em; line-height: 1; }
+    .cat-head .s { font-family: var(--f-latin); letter-spacing: .3em; font-size: 11px; margin-top: 8px; }
+    .cat-head h1 { font-family: var(--f-he-display); font-weight: 400; font-size: 22px; margin: 10px 0 0; }
+    .sec { font-family: var(--f-he-display); font-weight: 400; font-size: 24px; margin: 4mm 0 4mm; border-bottom: 1px solid var(--line); padding-bottom: 2mm; break-after: avoid; }
+    .cgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+    .citem { break-inside: avoid; }
+    .citem img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+    .citem h3 { font-size: 15px; margin: 6px 0 0; font-weight: 600; }
+    .citem p { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+    .citem .pr { font-family: var(--f-latin); color: var(--ink); font-weight: 500; }
+    .cfoot { margin-top: 10mm; padding-top: 8mm; display: flex; align-items: center; justify-content: space-between; gap: 6mm; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-2); }
+    .qr svg, .qr img { width: 26mm; height: 26mm; }
+    @media screen and (max-width: 820px) { .page { width: auto; min-height: 0; margin: 8px; padding: 18px 14px; } .cgrid { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+    @media print {
+      @page { size: A4; }
+      body { background: #fff; }
+      .toolbar { display: none; }
+      .page { margin: 0; box-shadow: none; width: auto; padding: 0; }
+      @page { margin: 12mm 12mm; }
+      .cfoot { break-inside: avoid; }
+      .cgrid { grid-template-columns: repeat(4, 1fr); gap: 5mm; }
+      .citem img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <select id="cat" aria-label="קטגוריה">
+      <option value="all" data-i18n="cat_all">הכל</option>
+      <option value="soap" data-i18n="cat_soap">סבונים</option>
+      <option value="candle" data-i18n="cat_candle">נרות</option>
+      <option value="bundle" data-i18n="cat_bundle">מארזים</option>
+    </select>
+    <label class="radio" style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="showPrices" checked> <span id="pricesLbl">מחירים</span></label>
+    <button class="btn btn-solid" id="printBtn" type="button">הדפסה / שמירה כ-PDF</button>
+    <button class="btn" id="shareBtn" type="button" data-i18n="share">שיתוף</button>
+    <button class="btn-lang" id="langBtn" type="button" data-i18n="lang_btn">English</button>
+    <a class="btn" href="/">← האתר</a>
+  </div>
+  <div id="pages"><div class="page"><p class="muted center" data-i18n="loading">טוען…</p></div></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script>
+  (function () {
+    const { api, pick, t, esc, price, applyI18n, applyTheme, shareLink } = RS;
+    const qs = new URLSearchParams(location.search);
+    const catSel = document.getElementById("cat"), showPrices = document.getElementById("showPrices");
+    if (qs.get("cat")) catSel.value = qs.get("cat");
+    if (qs.get("prices") === "0") showPrices.checked = false;
+    let products = [], settings = {};
+    const order = ["soap", "candle", "bundle", "other"];
+
+    function qrSvg(text) {
+      try { const q = qrcode(0, "M"); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 3, margin: 0, scalable: true }); }
+      catch (e) { return ""; }
+    }
+    function head(first) {
+      return first ? `<div class="cat-head"><div class="m">RÉBECCA</div><div class="s">HANDMADE NATURAL SOAP &amp; CANDLES</div>
+        <h1>${esc(RS.lang === "he" ? "קטלוג מוצרים" : "Product Catalog")}</h1></div>` : "";
+    }
+    function foot() {
+      const s = settings, site = location.origin;
+      return `<div class="cfoot"><div>
+          <div><b>Rébecca Studio</b> · ${esc(pick(s, "city"))}</div>
+          <div dir="ltr" style="text-align:start">${esc(s.phone || "")} · ${esc(s.email || "")}</div>
+          <div>${esc(site.replace(/^https?:\/\//, ""))}</div>
+          <div>${esc(RS.lang === "he" ? "הזמנות בוואטסאפ · מחירים עשויים להשתנות" : "Orders via WhatsApp · prices may change")}</div>
+        </div><div class="qr">${qrSvg(site + (RS.lang === "en" ? "/?lang=en" : "/"))}</div></div>`;
+    }
+    function render() {
+      applyI18n(); applyTheme(settings);
+      document.getElementById("pricesLbl").textContent = RS.lang === "he" ? "מחירים" : "Prices";
+      document.getElementById("printBtn").textContent = RS.lang === "he" ? "הדפסה / שמירה כ-PDF" : "Print / Save as PDF";
+      const cat = catSel.value;
+      const list = products.filter(p => cat === "all" || p.category === cat)
+        .sort((a, b) => order.indexOf(a.category) - order.indexOf(b.category) || a.sort_order - b.sort_order);
+      // one continuous sheet; the browser splits it into A4 pages when printing
+      let body = "", lastCat = null, grid = [];
+      const flush = () => { if (grid.length) { body += `<div class="cgrid">${grid.join("")}</div>`; grid = []; } };
+      list.forEach(it => {
+        if (it.category !== lastCat) { flush(); body += `<h2 class="sec">${esc(t("cat_" + it.category))}</h2>`; lastCat = it.category; }
+        const pr = showPrices.checked ? (it.price != null ? `<span class="pr">${price(it.price)}</span>` : `<span>${esc(t("price_ask"))}</span>`) : "";
+        grid.push(`<div class="citem"><img src="${esc((it.images && it.images[0]) || "/images/brand/og-cover.jpg")}" alt="">
+          <h3>${esc(pick(it, "name"))}</h3><p>${esc(pick(it, "short"))}</p><p>${pr}${it.sold_out ? " · " + esc(t("sold_out")) : ""}</p></div>`);
+      });
+      flush();
+      const html = list.length ? `<section class="page">${head(true)}${body}${foot()}</section>` : "";
+      document.getElementById("pages").innerHTML = html || `<div class="page"><p class="muted center">${esc(t("empty_cat"))}</p></div>`;
+    }
+    catSel.onchange = render; showPrices.onchange = render;
+    document.getElementById("printBtn").onclick = () => window.print();
+    document.getElementById("shareBtn").onclick = () => {
+      const u = new URL(location.origin + "/catalog/"); if (catSel.value !== "all") u.searchParams.set("cat", catSel.value);
+      if (!showPrices.checked) u.searchParams.set("prices", "0"); if (RS.lang === "en") u.searchParams.set("lang", "en");
+      shareLink(u.toString(), "Rébecca Studio");
+    };
+    document.getElementById("langBtn").onclick = () => { RS.lang = RS.lang === "he" ? "en" : "he"; RS.setLang(RS.lang); render(); };
+    Promise.all([api.products(), api.settings()]).then(([p, s]) => { products = p; settings = s; render(); })
+      .catch(e => { console.error(e); document.getElementById("pages").innerHTML = `<div class="page"><p class="center">${esc(t("load_err"))}</p></div>`; });
+  })();
+  </script>
+</body>
+</html>

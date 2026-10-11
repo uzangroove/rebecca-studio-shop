@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="he" dir="rtl" data-theme="mono">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rébecca Studio · סבונים ונרות בעבודת יד</title>
+  <meta name="description" content="Rébecca Studio — סבונים ונרות בעבודת יד מחומרים טבעיים, מכרמיאל. מארזי מתנה וסדנאות. הזמנה בוואטסאפ.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Rébecca Studio · סבונים ונרות בעבודת יד">
+  <meta property="og:description" content="סבונים ונרות בעבודת יד מחומרים טבעיים, מכרמיאל. מארזי מתנה וסדנאות.">
+  <meta property="og:image" content="/images/brand/og-cover.jpg">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://nvtpngjecdzerbbzqmtg.supabase.co" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+  <a class="skip" href="#main" data-i18n="skip">דילוג לתוכן</a>
+  <div class="announce" id="announce" hidden></div>
+
+  <header class="site-header">
+    <a class="wordmark" href="/" aria-label="Rébecca Studio">RÉBECCA</a>
+    <nav class="nav" aria-label="ניווט">
+      <a href="#products" data-i18n="nav_products">מוצרים</a>
+      <a href="#workshops" data-i18n="nav_workshops">סדנאות</a>
+      <a href="#about" data-i18n="nav_about">אודות</a>
+      <button class="btn-lang" id="langBtn" type="button" data-i18n="lang_btn">English</button>
+      <button class="btn-cart" id="cartBtn" type="button" data-i18n-aria="cart" aria-label="סל ההזמנה">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span class="cart-count" id="cartCount" hidden>0</span>
+      </button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <h1 class="hero-mark">RÉBECCA</h1>
+      <p class="hero-sub">HANDMADE NATURAL SOAP &amp; CANDLES</p>
+      <p class="hero-tag" id="heroTag">סבונים ונרות בעבודת יד, מחומרים טבעיים</p>
+    </section>
+
+    <section class="products" id="products" aria-labelledby="productsTitle">
+      <h2 class="section-title" id="productsTitle" data-i18n="products_title">המוצרים שלנו</h2>
+      <div class="filters" role="group" id="filters">
+        <button type="button" class="filter active" data-cat="all" data-i18n="cat_all">הכל</button>
+        <button type="button" class="filter" data-cat="soap" data-i18n="cat_soap">סבונים</button>
+        <button type="button" class="filter" data-cat="candle" data-i18n="cat_candle">נרות</button>
+        <button type="button" class="filter" data-cat="bundle" data-i18n="cat_bundle">מארזים</button>
+      </div>
+      <div class="grid" id="grid" aria-live="polite"><p class="muted center" data-i18n="loading">טוען…</p></div>
+      <p class="center catalog-link"><a href="/catalog/" data-i18n="catalog">קטלוג להורדה</a></p>
+    </section>
+
+    <section class="workshops" id="workshops" aria-labelledby="wsTitle">
+      <h2 class="section-title" id="wsTitle" data-i18n="workshops_title">סדנאות</h2>
+      <p class="ws-intro" id="wsIntro"></p>
+      <div class="ws-list" id="wsList"></div>
+    </section>
+
+    <section class="about" id="about" aria-labelledby="aboutTitle">
+      <div class="about-media">
+        <img src="/images/studio/studio-hero.jpg" alt="הסטודיו של רבקה בכרמיאל" loading="lazy" width="700" height="656">
+        <img src="/images/studio/hands-cutting.jpg" alt="חיתוך סבון בעבודת יד" loading="lazy" width="525" height="700">
+        <img src="/images/studio/flowers.jpg" alt="פרחי שעווה וסבון בהכנה" loading="lazy" width="525" height="700">
+      </div>
+      <div class="about-text">
+        <h2 class="section-title start" id="aboutTitle" data-i18n="about_title">אודות</h2>
+        <p id="aboutText"></p>
+        <div class="info-grid">
+          <div><h3 data-i18n="shipping_title">משלוחים ואיסוף</h3><p id="shippingText"></p></div>
+          <div><h3 data-i18n="payment_title">תשלום</h3><p id="paymentText"></p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" id="contact">
+    <div class="footer-mark">RÉBECCA</div>
+    <p class="footer-contact" id="footerContact"></p>
+    <p class="footer-social" id="footerSocial"></p>
+    <p class="footer-legal">
+      <a href="/legal/#accessibility" data-i18n="accessibility">הצהרת נגישות</a> ·
+      <a href="/legal/#privacy" data-i18n="privacy">מדיניות פרטיות</a> ·
+      <a href="/legal/#terms" data-i18n="terms">תקנון</a>
+    </p>
+    <p class="footer-copy">© <span id="year"></span> Rébecca Studio · <span data-i18n="footer_rights">כל הזכויות שמורות</span></p>
+  </footer>
+
+  <!-- floating contact pill -->
+  <div class="pill" id="pill">
+    <a class="pill-btn" id="pillWa" target="_blank" rel="noopener"><span data-i18n="whatsapp">וואטסאפ</span></a>
+    <a class="pill-btn" id="pillMail"><span data-i18n="email">מייל</span></a>
+    <a class="pill-btn" id="pillTel"><span data-i18n="call">טלפון</span></a>
+  </div>
+
+  <!-- product dialog -->
+  <dialog class="modal" id="productDlg" aria-labelledby="pdName">
+    <button class="modal-close" type="button" data-close data-i18n-aria="close" aria-label="סגירה">×</button>
+    <div class="pd">
+      <div class="pd-gallery">
+        <img id="pdImg" alt="">
+        <div class="pd-thumbs" id="pdThumbs"></div>
+      </div>
+      <div class="pd-info">
+        <p class="pd-cat" id="pdCat"></p>
+        <h2 id="pdName"></h2>
+        <p class="pd-price" id="pdPrice"></p>
+        <div class="pd-desc" id="pdDesc"></div>
+        <div class="pd-actions">
+          <div class="qty" aria-label="כמות">
+            <button type="button" id="pdMinus" aria-label="-">−</button>
+            <output id="pdQty">1</output>
+            <button type="button" id="pdPlus" aria-label="+">+</button>
+          </div>
+          <button class="btn btn-solid" type="button" id="pdAdd" data-i18n="add">הוספה לסל</button>
+        </div>
+        <div class="pd-links">
+          <a id="pdAsk" target="_blank" rel="noopener" data-i18n="ask_wa">שאלה בוואטסאפ</a>
+          <button type="button" class="linklike" id="pdShare" data-i18n="share">שיתוף</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- cart drawer -->
+  <dialog class="drawer" id="cartDlg" aria-labelledby="cartTitle">
+    <div class="drawer-head">
+      <h2 id="cartTitle" data-i18n="cart">סל ההזמנה</h2>
+      <button class="modal-close static" type="button" data-close data-i18n-aria="close" aria-label="סגירה">×</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <form class="cart-form" id="cartForm">
+      <p class="cart-total" id="cartTotal"></p>
+      <label><span data-i18n="your_name">שם</span><input name="name" autocomplete="name" required maxlength="80"></label>
+      <fieldset>
+        <legend data-i18n="delivery">קבלת ההזמנה</legend>
+        <label class="radio"><input type="radio" name="delivery" value="pickup" checked> <span data-i18n="pickup">איסוף עצמי מכרמיאל</span></label>
+        <label class="radio"><input type="radio" name="delivery" value="ship"> <span data-i18n="ship">משלוח</span></label>
+      </fieldset>
+      <label id="addrRow" hidden><span data-i18n="address">עיר וכתובת למשלוח</span><input name="address" autocomplete="street-address" maxlength="160"></label>
+      <label><span><span data-i18n="note">הערה</span> (<span data-i18n="optional">לא חובה</span>)</span><textarea name="note" rows="2" maxlength="400"></textarea></label>
+      <button class="btn btn-solid wide" type="submit" data-i18n="send_wa">שליחת ההזמנה בוואטסאפ</button>
+      <p class="muted small" data-i18n="cart_note"></p>
+      <button class="linklike small" type="button" id="cartClear" data-i18n="clear_cart">ניקוי הסל</button>
+    </form>
+  </dialog>
+
+  <!-- workshop signup dialog -->
+  <dialog class="modal narrow" id="wsDlg" aria-labelledby="wsDlgTitle">
+    <button class="modal-close" type="button" data-close data-i18n-aria="close" aria-label="סגירה">×</button>
+    <form class="ws-form" id="wsForm">
+      <h2 id="wsDlgTitle"></h2>
+      <p class="muted" id="wsDlgWhen"></p>
+      <label><span data-i18n="your_name">שם</span><input name="name" autocomplete="name" required minlength="2" maxlength="80"></label>
+      <label><span data-i18n="phone">טלפון</span><input name="phone" type="tel" autocomplete="tel" required pattern="[0-9 +\-\(\)]{7,20}" inputmode="tel"></label>
+      <label><span data-i18n="participants">משתתפים</span><input name="participants" type="number" min="1" max="20" value="1" required></label>
+      <label><span><span data-i18n="note">הערה</span> (<span data-i18n="optional">לא חובה</span>)</span><textarea name="note" rows="2" maxlength="500"></textarea></label>
+      <button class="btn btn-solid wide" type="submit" data-i18n="send">שליחה</button>
+      <p class="form-msg" id="wsMsg" role="status"></p>
+    </form>
+  </dialog>
+
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script src="/assets/js/site.js"></script>
+</body>
+</html>

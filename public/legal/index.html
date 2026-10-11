@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="he" dir="rtl" data-theme="mono">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>נגישות, פרטיות ותקנון · Rébecca Studio</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;500&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <style>
+    body { padding-bottom: 40px; }
+    .legal { max-width: 820px; margin: 0 auto; padding: 32px 16px 60px; }
+    .legal h2 { font-family: var(--f-he-display); font-weight: 400; font-size: 34px; margin: 48px 0 12px; text-align: center; }
+    html[lang="en"] .legal h2 { font-family: var(--f-display); }
+    .legal h3 { font-size: 18px; margin: 22px 0 6px; }
+    .legal p, .legal li { color: var(--ink-2); }
+    .legal [data-lang] { display: none; }
+    html[lang="he"] .legal [data-lang="he"], html[lang="en"] .legal [data-lang="en"] { display: block; }
+    .updated { text-align: center; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="/">RÉBECCA</a>
+    <nav class="nav"><a href="/" data-i18n="nav_products">מוצרים</a><button class="btn-lang" id="langBtn" type="button" data-i18n="lang_btn">English</button></nav>
+  </header>
+  <main class="legal" id="main">
+
+    <!-- ===================== ACCESSIBILITY ===================== -->
+    <section id="accessibility">
+      <div data-lang="he">
+        <h2>הצהרת נגישות</h2>
+        <p>ב-Rébecca Studio אנחנו רוצים שכל אחת ואחד יוכלו לגלוש באתר בנוחות. האתר נבנה בהתאם להנחיות התקן הישראלי ת״י 5568 המבוסס על הנחיות WCAG 2.0 ברמה AA, ככל שהדבר אפשרי.</p>
+        <h3>מה נעשה באתר</h3>
+        <ul>
+          <li>ניווט מלא במקלדת, כולל קישור "דילוג לתוכן" וסימון ברור של הפריט שבפוקוס.</li>
+          <li>טקסט חלופי לתמונות המוצרים.</li>
+          <li>ניגודיות צבעים גבוהה (שחור על לבן) וגופנים קריאים.</li>
+          <li>תמיכה בהגדלת טקסט בדפדפן ובתצוגה בטלפון, בטאבלט ובמחשב.</li>
+          <li>כיבוי אנימציות אוטומטי למי שהגדיר "הפחתת תנועה" במכשיר.</li>
+          <li>האתר זמין בעברית ובאנגלית.</li>
+        </ul>
+        <h3>נתקלתם בבעיה?</h3>
+        <p>אם משהו באתר לא נגיש עבורכם, נשמח לשמוע ולתקן. רכזת הנגישות: רבקה עוזן, טלפון/וואטסאפ <a href="tel:+972535200728" dir="ltr">053-5200728</a>, מייל <a href="mailto:rivka131@gmail.com">rivka131@gmail.com</a>. נשתדל לחזור תוך 3 ימי עבודה.</p>
+        <p>הסטודיו פועל בבית בכרמיאל. לפרטים על נגישות הסטודיו לסדנאות, פנו אלינו לפני ההגעה.</p>
+      </div>
+      <div data-lang="en">
+        <h2>Accessibility Statement</h2>
+        <p>We want everyone to be able to use the Rébecca Studio website comfortably. The site was built to follow Israeli Standard IS 5568, based on WCAG 2.0 level AA, as far as possible.</p>
+        <h3>What we did</h3>
+        <ul>
+          <li>Full keyboard navigation, a "skip to content" link and clear focus indicators.</li>
+          <li>Alternative text for product images.</li>
+          <li>High color contrast and readable fonts.</li>
+          <li>Support for browser text zoom on phone, tablet and desktop.</li>
+          <li>Animations turn off automatically when "reduce motion" is enabled on your device.</li>
+          <li>The site is available in Hebrew and English.</li>
+        </ul>
+        <h3>Found a problem?</h3>
+        <p>If anything on the site is not accessible to you, please tell us. Accessibility contact: Rebecca Uzan, phone/WhatsApp <a href="tel:+972535200728">+972-53-5200728</a>, email <a href="mailto:rivka131@gmail.com">rivka131@gmail.com</a>. We aim to reply within 3 business days.</p>
+      </div>
+    </section>
+
+    <!-- ===================== PRIVACY ===================== -->
+    <section id="privacy">
+      <div data-lang="he">
+        <h2>מדיניות פרטיות</h2>
+        <p>אנחנו אוספים רק את המידע הדרוש כדי לטפל בהזמנה או בהרשמה שלכם.</p>
+        <h3>איזה מידע נאסף</h3>
+        <ul>
+          <li><b>הזמנות:</b> ההזמנה נשלחת כהודעת וואטסאפ שאתם שולחים בעצמכם. האתר לא שומר את פרטי ההזמנה בשרת. תוכן הסל נשמר רק בדפדפן שלכם.</li>
+          <li><b>הרשמה לסדנה:</b> שם, טלפון, מספר משתתפים והערה. המידע נשמר במאגר מאובטח (Supabase) ומשמש רק לתיאום הסדנה.</li>
+          <li>האתר לא משתמש בעוגיות פרסום או במעקב של צד שלישי.</li>
+        </ul>
+        <h3>הזכויות שלכם</h3>
+        <p>אפשר לבקש לעיין במידע שנשמר עליכם, לתקן אותו או למחוק אותו, בפנייה לטלפון או למייל שלמעלה. המידע לא נמכר ולא מועבר לאחרים, למעט ספקי שירות טכניים שמפעילים את האתר.</p>
+      </div>
+      <div data-lang="en">
+        <h2>Privacy Policy</h2>
+        <p>We collect only the information needed to handle your order or registration.</p>
+        <h3>What we collect</h3>
+        <ul>
+          <li><b>Orders:</b> your order is sent as a WhatsApp message that you send yourself. The site does not store order details on a server. Your basket is kept only in your browser.</li>
+          <li><b>Workshop registration:</b> name, phone, number of participants and a note, stored in a secure database (Supabase) and used only to arrange the workshop.</li>
+          <li>The site does not use advertising cookies or third-party tracking.</li>
+        </ul>
+        <h3>Your rights</h3>
+        <p>You may ask to see, correct or delete the information we hold about you by contacting us. Your information is never sold or shared, except with the technical providers that run the site.</p>
+      </div>
+    </section>
+
+    <!-- ===================== TERMS ===================== -->
+    <section id="terms">
+      <div data-lang="he">
+        <h2>תקנון</h2>
+        <h3>הזמנות</h3>
+        <p>שליחת סל בוואטסאפ היא בקשת הזמנה. ההזמנה מאושרת לאחר תיאום מול רבקה, כולל מחיר סופי, זמינות, אופן תשלום ומשלוח.</p>
+        <h3>מוצרים בעבודת יד</h3>
+        <p>כל סבון ונר מיוצרים ביד, בכמויות קטנות. ייתכנו הבדלים קלים בצבע, בדוגמה ובמשקל בין המוצר שבתמונה למוצר שתקבלו, וזה חלק מהייחוד שלהם.</p>
+        <h3>מחירים</h3>
+        <p>המחירים באתר בשקלים וכוללים את כל המיסים החלים. המחירים עשויים להשתנות, והמחיר הקובע הוא המחיר שאושר בעת ההזמנה. דמי משלוח, אם יש, יימסרו לפני אישור ההזמנה.</p>
+        <h3>ביטול והחזרה</h3>
+        <p>ביטול עסקה יתאפשר בהתאם לחוק הגנת הצרכן. מטעמי היגיינה, מוצרי טיפוח שנפתחו או שהיו בשימוש אינם ניתנים להחזרה. מוצר שהגיע פגום יוחלף. לביטול או לבירור, פנו בוואטסאפ.</p>
+        <h3>סדנאות</h3>
+        <p>ההרשמה לסדנה מאושרת לאחר תיאום ותשלום. ביטול יתאפשר עד 72 שעות לפני מועד הסדנה. הסדנאות כוללות עבודה עם חומרים חמים ושמנים, ויש להקפיד על הוראות הבטיחות בסטודיו.</p>
+        <h3>שימוש בטוח</h3>
+        <p>לשימוש חיצוני בלבד. מומלץ לבדוק רגישות על אזור קטן בעור לפני השימוש. אין להשאיר נר דולק ללא השגחה, ויש להרחיק נרות מילדים, מחיות מחמד ומחומרים דליקים.</p>
+      </div>
+      <div data-lang="en">
+        <h2>Terms</h2>
+        <h3>Orders</h3>
+        <p>Sending your basket on WhatsApp is an order request. Your order is confirmed after coordinating with Rebecca on the final price, availability, payment and delivery.</p>
+        <h3>Handmade products</h3>
+        <p>Every soap and candle is made by hand in small batches. Slight differences in color, pattern and weight from the photo are part of what makes each piece unique.</p>
+        <h3>Prices</h3>
+        <p>Prices are in Israeli shekels and include all applicable taxes. Prices may change; the price confirmed when you order is the price that applies. Shipping fees, if any, are given before the order is confirmed.</p>
+        <h3>Cancellation and returns</h3>
+        <p>Cancellations are handled according to the Israeli Consumer Protection Law. For hygiene reasons, opened or used personal-care products cannot be returned. Products that arrive damaged will be replaced. Contact us on WhatsApp.</p>
+        <h3>Workshops</h3>
+        <p>A workshop place is confirmed after coordination and payment. Cancellations are possible up to 72 hours before the workshop.</p>
+        <h3>Safe use</h3>
+        <p>For external use only. Patch-test on a small area of skin first. Never leave a burning candle unattended, and keep candles away from children, pets and flammable materials.</p>
+      </div>
+      <p class="updated muted">עודכן: אוקטובר 2026 · Updated: October 2026</p>
+    </section>
+  </main>
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/common.js"></script>
+  <script>
+    RS.applyI18n();
+    document.getElementById("langBtn").onclick = () => { RS.lang = RS.lang === "he" ? "en" : "he"; RS.setLang(RS.lang); RS.applyI18n(); };
+    if (location.hash) setTimeout(() => document.querySelector(location.hash)?.scrollIntoView(), 50);
+  </script>
+</body>
+</html>
