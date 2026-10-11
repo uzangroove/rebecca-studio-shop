@@ -270,7 +270,3 @@ html[lang="en"] .tb-btn { font-family: var(--f-latin); font-size: 14px; }
   .tb-btn, .btn-cart { width: 38px; height: 38px; }
   .btn-lang { padding: 8px 12px; font-size: 13px; }
 }
-/* banner shrinks a little after scrolling, so it takes less of the screen */
-.topbar .tb-mark, .topbar .tb-sub, .topbar .tb-tag { transition: font-size .25s var(--ease), opacity .25s var(--ease), margin .25s var(--ease); }
-.topbar.compact .tb-sub, .topbar.compact .tb-tag { opacity: 0; height: 0; margin: 0; overflow: hidden; }
-.topbar.compact .tb-mark { font-size: clamp(26px, 3vw, 34px); }

@@ -273,11 +273,6 @@
     RS.lang = RS.lang === "he" ? "en" : "he"; RS.setLang(RS.lang); renderAll();
   };
 
-  /* compact banner after scrolling */
-  const topbar = $("#top");
-  const onScroll = () => topbar && topbar.classList.toggle("compact", scrollY > 60);
-  addEventListener("scroll", onScroll, { passive: true }); onScroll();
-
   /* decorative cursor ring on desktop */
   if (matchMedia("(pointer:fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const ring = document.createElement("div"); ring.className = "cursor-ring"; ring.setAttribute("aria-hidden", "true"); document.body.appendChild(ring);
