@@ -9,7 +9,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/admin/manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/admin.css?v=20261011c">
+  <link rel="stylesheet" href="/admin/admin.css?v=20261011d">
 </head>
 <body>
   <!-- ============ LOGIN ============ -->
@@ -31,6 +31,7 @@
     <header class="top">
       <div class="mark small">RÉBECCA</div>
       <div class="top-actions">
+        <a class="chip" id="studioLink" target="_blank" rel="noopener" hidden>סטודיו תמונות ↗</a>
         <a class="chip" href="/" target="_blank" rel="noopener">לאתר ↗</a>
         <button class="chip" id="logoutBtn" type="button">יציאה</button>
       </div>
@@ -65,6 +66,20 @@
         </div>
         <p class="hint">סדנה בלי תאריך תופיע באתר כ"בתיאום אישי". רק סדנאות שמסומנות "מוצג באתר" נראות ללקוחות.</p>
         <div class="list" id="wsList"></div>
+      </section>
+
+      <!-- inbox: images sent from the photo studio -->
+      <section class="view" data-view="inbox" hidden>
+        <div class="view-head">
+          <h1>תמונות חדשות</h1>
+          <a class="btn" id="studioLink2" target="_blank" rel="noopener" hidden>לסטודיו התמונות ↗</a>
+        </div>
+        <p class="hint">תמונות ששלחת מסטודיו התמונות. שום תמונה לא עולה לאתר עד שתבחרי מה לעשות איתה.</p>
+        <div class="toolbar"><div class="chips" id="inboxFilter">
+          <button class="chip on" data-f="new" type="button">ממתינות</button>
+          <button class="chip" data-f="all" type="button">כל התמונות</button>
+        </div></div>
+        <div class="inbox-grid" id="inboxGrid"></div>
       </section>
 
       <!-- signups -->
@@ -107,6 +122,9 @@
             <label>Facebook<input name="facebook" type="url" dir="ltr"></label>
             <label>TikTok<input name="tiktok" type="url" dir="ltr"></label>
           </fieldset>
+          <fieldset><legend>סטודיו התמונות</legend>
+            <label>כתובת סטודיו התמונות (לכפתור "סטודיו תמונות")<input name="photo_studio_url" type="url" dir="ltr" placeholder="https://…workers.dev"></label>
+          </fieldset>
           <fieldset><legend>מראה</legend>
             <label class="radio"><input type="radio" name="theme" value="mono"> שחור-לבן (כמו היום)</label>
             <label class="radio"><input type="radio" name="theme" value="brand"> צבעי המותג: ירוק עמוק, זהב ושמנת</label>
@@ -135,6 +153,7 @@
     <nav class="tabs" aria-label="ניווט ניהול">
       <button class="tab on" data-tab="products" type="button"><span class="ico">◻︎</span>מוצרים</button>
       <button class="tab" data-tab="workshops" type="button"><span class="ico">✦</span>סדנאות</button>
+      <button class="tab" data-tab="inbox" type="button"><span class="ico">✧</span>תמונות <b class="dot" id="newInbox" hidden></b></button>
       <button class="tab" data-tab="signups" type="button"><span class="ico">✎</span>הרשמות <b class="dot" id="newSignups" hidden></b></button>
       <button class="tab" data-tab="settings" type="button"><span class="ico">⚙︎</span>הגדרות</button>
     </nav>
@@ -159,6 +178,7 @@
           <label class="btn wide upload">+ הוספת תמונות מהגלריה או מהמצלמה
             <input type="file" id="prodFiles" accept="image/*" multiple hidden>
           </label>
+          <button class="btn wide" type="button" id="pickInbox">+ בחירה מהתמונות החדשות</button>
           <p class="hint" id="uploadMsg"></p>
         </fieldset>
         <label>קטגוריה
@@ -227,6 +247,40 @@
     </form>
   </dialog>
 
+  <!-- ============ PICK FROM INBOX (inside product editor) ============ -->
+  <dialog id="pickDlg" class="sheet">
+    <div class="form">
+      <div class="sheet-head">
+        <button class="chip" type="button" data-close>ביטול</button>
+        <h2>בחירה מהתמונות החדשות</h2>
+        <button class="btn solid" type="button" id="pickDone">הוספה</button>
+      </div>
+      <div class="sheet-body">
+        <p class="hint">סמני תמונה אחת או יותר. הן יתווספו למוצר אחרי לחיצה על "שמירה" בטופס המוצר.</p>
+        <div class="inbox-grid pick" id="pickGrid"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============ ASSIGN INBOX IMAGE TO EXISTING PRODUCT ============ -->
+  <dialog id="assignDlg" class="sheet">
+    <div class="form">
+      <div class="sheet-head">
+        <button class="chip" type="button" data-close>ביטול</button>
+        <h2>הוספה למוצר קיים</h2><span></span>
+      </div>
+      <div class="sheet-body">
+        <img class="assign-preview" id="assignImg" alt="">
+        <div class="chips">
+          <label class="radio"><input type="radio" name="assignPos" value="extra" checked> כתמונה נוספת</label>
+          <label class="radio"><input type="radio" name="assignPos" value="main"> כתמונה ראשית</label>
+        </div>
+        <input type="search" id="assignSearch" placeholder="חיפוש מוצר…" aria-label="חיפוש מוצר">
+        <div class="list" id="assignList"></div>
+      </div>
+    </div>
+  </dialog>
+
   <!-- ============ SHARE SHEET ============ -->
   <dialog id="shareDlg" class="sheet">
     <div class="form">
@@ -265,7 +319,7 @@
   <div id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-  <script src="/assets/js/config.js?v=20261011c"></script>
-  <script src="/admin/admin.js?v=20261011c"></script>
+  <script src="/assets/js/config.js?v=20261011d"></script>
+  <script src="/admin/admin.js?v=20261011d"></script>
 </body>
 </html>

@@ -108,3 +108,26 @@ dialog.sheet::backdrop { background: rgba(0,0,0,.4); }
 
 .tag.warn { color: #8a5a00; border-color: #f0d9a8; background: #fff8e8; }
 .todo { background: #fff8e8; border: 1px solid #f0d9a8; border-radius: 14px; padding: 12px 14px; margin: 0 0 14px; font-size: 15px; }
+
+/* inbox */
+.tabs { grid-template-columns: repeat(5, 1fr); }
+.inbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.inbox-card { background: var(--bg); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+.inbox-card.done { opacity: .7; }
+.inbox-card .ph { position: relative; aspect-ratio: 1; background: var(--soft); }
+.inbox-card .ph img { width: 100%; height: 100%; object-fit: cover; }
+.inbox-card .ph .tag { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,.92); }
+.inbox-card .meta { padding: 8px 10px 0; font-size: 13px; color: var(--ink2); }
+.inbox-card .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px 10px 10px; }
+.inbox-card .acts button { min-height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); font-size: 14px; font-weight: 600; }
+.inbox-card .acts button.main { background: var(--ink); color: #fff; border-color: var(--ink); }
+.inbox-card .acts button.del { color: var(--bad); }
+.pick .inbox-card { cursor: pointer; border-width: 3px; border-color: transparent; }
+.pick .inbox-card.sel { border-color: var(--ink); }
+.pick .inbox-card .check { position: absolute; top: 8px; left: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.95); border: 2px solid var(--ink); display: grid; place-items: center; font-weight: 700; }
+.assign-preview { width: 140px; height: 140px; object-fit: cover; border-radius: 12px; align-self: center; }
+.list .row.pick-row { cursor: pointer; }
+.top-actions .chip { white-space: nowrap; padding: 6px 12px; font-size: 14px; }
+@media (max-width: 420px) { .mark.small { font-size: 18px; letter-spacing: .1em; } .top-actions { gap: 6px; } .top-actions .chip { padding: 5px 10px; font-size: 13px; } }
+a.btn { color: var(--ink); }
+.inbox-card .acts button { white-space: nowrap; font-size: 13px; padding: 0 4px; }

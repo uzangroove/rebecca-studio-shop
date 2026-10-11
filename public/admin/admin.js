@@ -8,7 +8,7 @@
   const CAT = { soap: "סבונים", candle: "נרות", bundle: "מארזים", other: "עוד" };
   const SITE = location.origin;
 
-  const S = { products: [], workshops: [], signups: [], settings: {}, cat: "all", q: "", editing: null, editImgs: [], wsEditing: null, wsImg: null, share: null, fmt: "square" };
+  const S = { products: [], workshops: [], signups: [], settings: {}, cat: "all", q: "", editing: null, editImgs: [], wsEditing: null, wsImg: null, share: null, fmt: "square", inbox: [], inboxFilter: "new", pendingInbox: [] };
 
   function toast(m, ms = 2400) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), ms); }
   function fail(e) { console.error(e); toast("שגיאה: " + (e && e.message ? e.message : e), 5000); }
@@ -22,7 +22,7 @@
     const { data: ok, error } = await sb.rpc("is_admin");
     if (error || !ok) { await sb.auth.signOut(); return showLogin("למשתמש הזה אין הרשאת ניהול."); }
     $("#login").hidden = true; $("#app").hidden = false;
-    await Promise.all([loadProducts(), loadWorkshops(), loadSettings(), loadSignups()]);
+    await Promise.all([loadProducts(), loadWorkshops(), loadSettings(), loadSignups(), loadInbox()]);
   }
   function showLogin(msg) { $("#app").hidden = true; $("#login").hidden = false; $("#loginMsg").textContent = msg || ""; }
   $("#loginForm").onsubmit = async e => {
@@ -137,13 +137,14 @@
     return s;
   }
 
-  function openProduct(p) {
+  function openProduct(p, opts = {}) {
     const f = $("#prodForm"); f.reset();
     S.editing = p || null;
-    S.editImgs = p ? [...(p.images || [])] : [];
+    S.editImgs = p ? [...(p.images || [])] : [...(opts.images || [])];
+    S.pendingInbox = [...(opts.inboxIds || [])];
     $("#prodDlgTitle").textContent = p ? "עריכת מוצר" : "מוצר חדש";
     $("#prodDelete").hidden = !p;
-    const v = p || { category: S.cat !== "all" ? S.cat : "soap", published: true, sort_order: 100 };
+    const v = p || { category: S.cat !== "all" ? S.cat : "soap", published: !opts.inboxIds, sort_order: 100 };
     ["category", "name_he", "name_en", "short_he", "short_en", "desc_he", "desc_en", "price", "price_note_he", "price_note_en", "slug", "sort_order"]
       .forEach(k => { if (f[k]) f[k].value = v[k] == null ? "" : v[k]; });
     ["published", "sold_out", "featured"].forEach(k => f[k].checked = !!v[k]);
@@ -200,11 +201,17 @@
     const selfId = S.editing && S.editing.id;
     row.slug = uniqueSlug(slugify(val("slug") || row.name_en || "") || (S.editing && S.editing.slug) || "", selfId);
     btn.disabled = true;
-    const q = selfId ? sb.from("products").update(row).eq("id", selfId) : sb.from("products").insert(row);
-    const { error } = await q;
+    const q = selfId ? sb.from("products").update(row).eq("id", selfId).select("id").single() : sb.from("products").insert(row).select("id").single();
+    const { data: saved, error } = await q;
     btn.disabled = false;
     if (error) return fail(error);
-    $("#prodDlg").close(); toast("נשמר ✓"); loadProducts();
+    const used = S.pendingInbox.filter(id => S.inbox.some(m => m.id === id && row.images.includes(m.url)));
+    if (used.length) {
+      const { error: e2 } = await sb.from("media_inbox").update({ status: "used", product_id: saved.id }).in("id", used);
+      if (e2) console.warn(e2);
+    }
+    S.pendingInbox = [];
+    $("#prodDlg").close(); toast(row.published ? "נשמר ✓" : "נשמר ✓ (מוסתר באתר עד שתסמני \"מוצג באתר\")"); loadProducts(); loadInbox();
   };
   $("#newProduct").onclick = () => openProduct(null);
   $("#prodDelete").onclick = async () => {
@@ -214,6 +221,112 @@
     if (error) return fail(error);
     for (const src of p.images || []) { try { await removeStorageImage(src); } catch (e) {} }
     $("#prodDlg").close(); toast("נמחק"); loadProducts();
+  };
+
+  /* ================= inbox: images sent from the photo studio ================= */
+  function applyStudioLink() {
+    const u = (S.settings.photo_studio_url || "").trim();
+    ["#studioLink", "#studioLink2"].forEach(sel => { const a = $(sel); if (!a) return; a.hidden = !u; if (u) a.href = u; });
+  }
+  async function loadInbox() {
+    const { data, error } = await sb.from("media_inbox").select("*").order("created_at", { ascending: false }).limit(200);
+    if (error) { console.warn(error); return; }
+    S.inbox = data; renderInbox();
+  }
+  const STATUS_LBL = { new: "ממתינה", used: "במוצר", post: "לפוסט", discarded: "נדחתה" };
+  function inboxMeta(m) {
+    const d = new Date(m.created_at).toLocaleDateString("he-IL", { day: "numeric", month: "short", timeZone: "Asia/Jerusalem" });
+    return `${m.variant === "branded" ? "עם מיתוג" : "נקייה"} · ${d}`;
+  }
+  function renderInbox() {
+    const items = S.inbox.filter(m => S.inboxFilter === "all" || m.status === "new");
+    const n = S.inbox.filter(m => m.status === "new").length;
+    const dot = $("#newInbox"); dot.textContent = n; dot.hidden = n === 0;
+    $("#inboxGrid").innerHTML = items.length ? items.map(m => {
+      const prod = m.product_id && S.products.find(p => p.id === m.product_id);
+      return `<div class="inbox-card ${m.status === "new" ? "" : "done"}">
+        <div class="ph"><img src="${esc(m.url)}" alt="" loading="lazy"><span class="tag ${m.status === "new" ? "warn" : m.status === "used" ? "ok" : ""}">${STATUS_LBL[m.status]}</span></div>
+        <div class="meta">${esc(inboxMeta(m))}${prod ? ` · ${esc(prod.name_he)}` : ""}</div>
+        <div class="acts">
+          <button type="button" class="main" data-ix="new" data-id="${m.id}">מוצר חדש</button>
+          <button type="button" data-ix="assign" data-id="${m.id}">למוצר קיים</button>
+          <button type="button" data-ix="post" data-id="${m.id}">לפוסט</button>
+          <button type="button" class="del" data-ix="del" data-id="${m.id}">מחיקה</button>
+        </div>
+      </div>`;
+    }).join("") : `<div class="empty" style="grid-column:1/-1">${S.inboxFilter === "new" ? "אין תמונות ממתינות. תמונות שתשלחי מסטודיו התמונות יופיעו כאן." : "עדיין לא נשלחו תמונות."}</div>`;
+  }
+  $$("#inboxFilter .chip").forEach(b => b.onclick = () => { S.inboxFilter = b.dataset.f; $$("#inboxFilter .chip").forEach(x => x.classList.toggle("on", x === b)); renderInbox(); });
+  $("#inboxGrid").addEventListener("click", async e => {
+    const b = e.target.closest("button[data-ix]"); if (!b) return;
+    const m = S.inbox.find(x => x.id === b.dataset.id); if (!m) return;
+    if (b.dataset.ix === "new") return openProduct(null, { images: [m.url], inboxIds: [m.id] });
+    if (b.dataset.ix === "assign") return openAssign(m);
+    if (b.dataset.ix === "post") {
+      await sb.from("media_inbox").update({ status: "post" }).eq("id", m.id);
+      m.status = "post"; renderInbox();
+      return openShare({ name_he: "Rébecca Studio", short_he: "", desc_he: "", category: "other", price: null, images: [m.url], slug: null });
+    }
+    if (b.dataset.ix === "del") {
+      if (!confirm("למחוק את התמונה מהתיבה? (מוצר שכבר משתמש בה לא ייפגע אם התמונה לא בשימוש)")) return;
+      const inUse = S.products.some(p => (p.images || []).includes(m.url));
+      const { error } = await sb.from("media_inbox").delete().eq("id", m.id);
+      if (error) return fail(error);
+      if (!inUse && m.storage_path) { try { await sb.storage.from("media").remove([m.storage_path]); } catch (err) {} }
+      S.inbox = S.inbox.filter(x => x.id !== m.id); renderInbox(); toast("נמחקה");
+    }
+  });
+
+  // assign to an existing product
+  let assignItem = null;
+  function openAssign(m) {
+    assignItem = m; $("#assignImg").src = m.url; $("#assignSearch").value = ""; renderAssign(); $("#assignDlg").showModal();
+  }
+  function renderAssign() {
+    const q = $("#assignSearch").value.trim().toLowerCase();
+    const items = S.products.filter(p => !q || [p.name_he, p.name_en].join(" ").toLowerCase().includes(q));
+    $("#assignList").innerHTML = items.map(p => `<div class="row pick-row" data-pid="${p.id}" role="button" tabindex="0">
+      ${p.images && p.images[0] ? `<img src="${esc(abs(p.images[0]))}" alt="">` : `<div class="noimg"></div>`}
+      <div><h3>${esc(p.name_he)}</h3><div class="sub">${esc(CAT[p.category])} · ${(p.images || []).length} תמונות</div></div></div>`).join("") || `<div class="empty">לא נמצא מוצר</div>`;
+  }
+  $("#assignSearch").oninput = renderAssign;
+  async function doAssign(pid) {
+    const p = S.products.find(x => x.id === pid); if (!p || !assignItem) return;
+    const asMain = document.querySelector('input[name="assignPos"]:checked').value === "main";
+    const imgs = (p.images || []).filter(u => u !== assignItem.url);
+    const next = asMain ? [assignItem.url, ...imgs] : [...imgs, assignItem.url];
+    const { error } = await sb.from("products").update({ images: next }).eq("id", p.id);
+    if (error) return fail(error);
+    await sb.from("media_inbox").update({ status: "used", product_id: p.id }).eq("id", assignItem.id);
+    $("#assignDlg").close(); toast(`התמונה נוספה ל"${p.name_he}" ✓`); loadProducts(); loadInbox();
+  }
+  $("#assignList").addEventListener("click", e => { const r = e.target.closest("[data-pid]"); if (r) doAssign(r.dataset.pid); });
+  $("#assignList").addEventListener("keydown", e => { const r = e.target.closest("[data-pid]"); if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); doAssign(r.dataset.pid); } });
+
+  // pick inbox images from inside the product editor
+  const picked = new Set();
+  $("#pickInbox").onclick = async () => {
+    await loadInbox();
+    picked.clear();
+    const items = S.inbox.filter(m => m.status === "new" && !S.editImgs.includes(m.url));
+    $("#pickGrid").innerHTML = items.length ? items.map(m => `<div class="inbox-card" data-pick="${m.id}" role="button" tabindex="0" aria-pressed="false">
+      <div class="ph"><img src="${esc(m.url)}" alt="" loading="lazy"><span class="check" hidden>✓</span></div>
+      <div class="meta" style="padding-bottom:8px">${esc(inboxMeta(m))}</div></div>`).join("")
+      : `<div class="empty" style="grid-column:1/-1">אין תמונות ממתינות בתיבה.</div>`;
+    $("#pickDone").textContent = "הוספה"; $("#pickDlg").showModal();
+  };
+  function togglePick(card) {
+    const id = card.dataset.pick, on = !picked.has(id);
+    on ? picked.add(id) : picked.delete(id);
+    card.classList.toggle("sel", on); card.setAttribute("aria-pressed", on); card.querySelector(".check").hidden = !on;
+    $("#pickDone").textContent = picked.size ? `הוספה (${picked.size})` : "הוספה";
+  }
+  $("#pickGrid").addEventListener("click", e => { const c = e.target.closest("[data-pick]"); if (c) togglePick(c); });
+  $("#pickGrid").addEventListener("keydown", e => { const c = e.target.closest("[data-pick]"); if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); togglePick(c); } });
+  $("#pickDone").onclick = () => {
+    for (const id of picked) { const m = S.inbox.find(x => x.id === id); if (m && !S.editImgs.includes(m.url)) { S.editImgs.push(m.url); S.pendingInbox.push(m.id); } }
+    renderEditImgs(); $("#pickDlg").close();
+    if (picked.size) $("#uploadMsg").textContent = "התמונות נוספו ✓ (נשמרות במוצר אחרי לחיצה על שמירה)";
   };
 
   /* ================= workshops ================= */
@@ -357,6 +470,7 @@
     const { data, error } = await sb.from("settings").select("data").eq("id", 1).single();
     if (error) return fail(error);
     S.settings = data.data || {};
+    applyStudioLink();
     const f = $("#settingsForm");
     Array.from(f.elements).forEach(el => {
       if (!el.name) return;
@@ -370,7 +484,7 @@
     for (const [k, v] of fd.entries()) next[k] = String(v).trim();
     next.whatsapp = (next.whatsapp || "").replace(/[^0-9]/g, "");
     const { error } = await sb.from("settings").update({ data: next }).eq("id", 1);
-    if (error) return fail(error); S.settings = next; toast("ההגדרות נשמרו ✓");
+    if (error) return fail(error); S.settings = next; applyStudioLink(); toast("ההגדרות נשמרו ✓");
   };
   $$("[data-copy]").forEach(b => b.onclick = async () => { const u = SITE + b.dataset.copy; try { await navigator.clipboard.writeText(u); toast("הועתק: " + u); } catch (e) { prompt("", u); } });
   $$("[data-wa-share]").forEach(b => b.onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent("הקטלוג של Rébecca Studio 🌿\n" + SITE + b.dataset.waShare)}`, "_blank", "noopener"));
@@ -382,7 +496,7 @@
 
   /* ================= share / social tools ================= */
   function captionFor(p) {
-    const link = `${SITE}/p/${p.slug}`;
+    const link = p.slug ? `${SITE}/p/${p.slug}` : SITE;
     const tags = { soap: "#סבון_טבעי #סבוןבעבודתיד #handmadesoap", candle: "#נרות #נרותבעבודתיד #handmadecandles", bundle: "#מארזמתנה #מתנה #giftbox", other: "#עבודתיד" }[p.category];
     const body = [
       `${p.name_he} 🌿`,
@@ -394,7 +508,7 @@
   }
   function openShare(p) {
     S.share = p; S.fmt = "square";
-    const link = `${SITE}/p/${p.slug}`;
+    const link = p.slug ? `${SITE}/p/${p.slug}` : SITE;
     $("#shareName").textContent = p.name_he;
     $("#shWa").href = `https://wa.me/?text=${encodeURIComponent(`${p.name_he} 🌿\n${link}`)}`;
     $("#shFb").href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`;
@@ -402,7 +516,7 @@
     $$("#shareDlg [data-fmt]").forEach(x => x.classList.toggle("on", x.dataset.fmt === "square"));
     $("#shareDlg").showModal(); drawCard();
   }
-  $("#shCopyLink").onclick = async () => { const u = `${SITE}/p/${S.share.slug}`; try { await navigator.clipboard.writeText(u); toast("הקישור הועתק"); } catch (e) { prompt("", u); } };
+  $("#shCopyLink").onclick = async () => { const u = S.share.slug ? `${SITE}/p/${S.share.slug}` : SITE; try { await navigator.clipboard.writeText(u); toast("הקישור הועתק"); } catch (e) { prompt("", u); } };
   $("#shCopyCaption").onclick = async () => { try { await navigator.clipboard.writeText($("#shCaption").value); toast("הטקסט הועתק — אפשר להדביק באינסטגרם/פייסבוק"); } catch (e) { $("#shCaption").select(); } };
   $$("#shareDlg [data-fmt]").forEach(b => b.onclick = () => { S.fmt = b.dataset.fmt; $$("#shareDlg [data-fmt]").forEach(x => x.classList.toggle("on", x === b)); drawCard(); });
 
@@ -438,12 +552,12 @@
   }
   function canvasBlob() { return new Promise(res => $("#shCanvas").toBlob(res, "image/jpeg", 0.92)); }
   $("#shDownload").onclick = async () => {
-    try { const b = await canvasBlob(); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `${S.share.slug}-${S.fmt}.jpg`; a.click(); }
+    try { const b = await canvasBlob(); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `${S.share.slug || "rebecca"}-${S.fmt}.jpg`; a.click(); }
     catch (e) { fail(e); }
   };
   $("#shShareImg").onclick = async () => {
     try {
-      const b = await canvasBlob(), file = new File([b], `${S.share.slug}.jpg`, { type: "image/jpeg" });
+      const b = await canvasBlob(), file = new File([b], `${S.share.slug || "rebecca"}.jpg`, { type: "image/jpeg" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], text: $("#shCaption").value });
       else { toast("בדפדפן הזה אין שיתוף ישיר — מורידה את התמונה"); $("#shDownload").click(); }
     } catch (e) { if (e.name !== "AbortError") fail(e); }
