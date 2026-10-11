@@ -111,9 +111,9 @@
     const ann = pick(s, "announcement"), annEl = $("#announce");
     annEl.textContent = ann; annEl.hidden = !ann;
     const wa = s.whatsapp || RS_CONFIG.DEFAULT_WHATSAPP;
-    $("#pillWa").href = waLink(wa, "");
-    $("#pillMail").href = `mailto:${s.email || ""}`;
-    $("#pillTel").href = `tel:${(s.phone || "").replace(/[^0-9+]/g, "")}`;
+    $("#tbWa").href = waLink(wa, "");
+    $("#tbMail").href = `mailto:${s.email || ""}`;
+    $("#tbTel").href = `tel:${(s.phone || "").replace(/[^0-9+]/g, "")}`;
     $("#footerContact").innerHTML = [
       s.phone ? `<a href="tel:${esc(s.phone.replace(/[^0-9+]/g, ""))}" dir="ltr">${esc(s.phone)}</a>` : "",
       s.email ? `<a href="mailto:${esc(s.email)}">${esc(s.email)}</a>` : "",
@@ -271,6 +271,11 @@
   $("#langBtn").onclick = () => {
     RS.lang = RS.lang === "he" ? "en" : "he"; RS.setLang(RS.lang); renderAll();
   };
+
+  /* compact banner after scrolling */
+  const topbar = $("#top");
+  const onScroll = () => topbar.classList.toggle("compact", scrollY > 60);
+  addEventListener("scroll", onScroll, { passive: true }); onScroll();
 
   /* decorative cursor ring on desktop */
   if (matchMedia("(pointer:fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {

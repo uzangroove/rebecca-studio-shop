@@ -31,7 +31,7 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
   font-family: var(--f-he); font-size: 17px; line-height: 1.6;
-  padding-bottom: 96px;
+  padding-bottom: 0;
 }
 html[lang="en"] body { font-family: var(--f-latin); font-size: 16px; }
 img { max-width: 100%; display: block; }
@@ -232,3 +232,45 @@ html[dir="ltr"] .drawer { --dir: 1; }
   .card-foot { flex-wrap: wrap; }
   .card-foot .btn { width: 100%; }
 }
+
+/* ================= fixed top banner (index) ================= */
+.topbar {
+  position: sticky; top: 0; z-index: 25;
+  display: grid; grid-template-columns: 1fr auto 1fr; grid-template-areas: "contact brand tools" "nav nav nav";
+  align-items: center; column-gap: 16px;
+  padding: 12px clamp(16px, 4vw, 48px) 0;
+  background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.tb-contact { grid-area: contact; display: flex; gap: 8px; justify-self: start; flex-wrap: wrap; }
+.tb-tools { grid-area: tools; display: flex; gap: 10px; align-items: center; justify-self: end; }
+.tb-brand { grid-area: brand; display: flex; flex-direction: column; align-items: center; text-decoration: none; text-align: center; }
+.tb-mark { font-family: var(--f-display); font-size: clamp(34px, 4.6vw, 52px); letter-spacing: .1em; line-height: 1; }
+.tb-sub { font-family: var(--f-latin); letter-spacing: .3em; font-size: clamp(10px, 1.1vw, 12px); margin-top: 7px; }
+.tb-tag { color: var(--ink-2); font-size: 14px; margin-top: 3px; }
+.tb-nav { grid-area: nav; display: flex; justify-content: center; gap: clamp(18px, 4vw, 40px); padding: 8px 0 9px; margin-top: 8px; border-top: 1px solid var(--line); }
+.tb-nav a { text-decoration: none; font-size: 16px; }
+.tb-nav a:hover { text-decoration: underline; text-underline-offset: 6px; }
+.tb-btn { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; border: 1.5px solid var(--ink); border-radius: 999px; text-decoration: none; font-size: 15px; font-weight: 600; transition: background .25s var(--ease), color .25s var(--ease); white-space: nowrap; }
+.tb-btn svg { width: 19px; height: 19px; flex: none; }
+.tb-btn:hover { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.tb-btn.wa { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.tb-btn.wa:hover { opacity: .88; }
+html[lang="en"] .tb-btn { font-family: var(--f-latin); font-size: 14px; }
+/* content starts right under the banner */
+.products { padding-top: clamp(22px, 3vw, 36px); }
+.products .section-title { margin-bottom: 18px; }
+#rs-toast { bottom: 24px; }
+@media (max-width: 1050px) { .tb-btn span { display: none; } .tb-btn { width: 40px; padding: 0; justify-content: center; } .tb-tag { display: none; } }
+@media (max-width: 640px) {
+  .topbar { grid-template-columns: 1fr 1fr; grid-template-areas: "brand brand" "contact tools" "nav nav"; row-gap: 8px; padding-top: 10px; }
+  .tb-mark { font-size: 32px; }
+  .tb-sub { font-size: 9.5px; letter-spacing: .24em; margin-top: 5px; }
+  .tb-nav { margin-top: 2px; padding: 6px 0 7px; }
+  .tb-btn, .btn-cart { width: 38px; height: 38px; }
+  .btn-lang { padding: 8px 12px; font-size: 13px; }
+}
+/* banner shrinks a little after scrolling, so it takes less of the screen */
+.topbar .tb-mark, .topbar .tb-sub, .topbar .tb-tag { transition: font-size .25s var(--ease), opacity .25s var(--ease), margin .25s var(--ease); }
+.topbar.compact .tb-sub, .topbar.compact .tb-tag { opacity: 0; height: 0; margin: 0; overflow: hidden; }
+.topbar.compact .tb-mark { font-size: clamp(26px, 3vw, 34px); }

@@ -21,27 +21,38 @@
   <a class="skip" href="#main" data-i18n="skip">דילוג לתוכן</a>
   <div class="announce" id="announce" hidden></div>
 
-  <header class="site-header">
-    <a class="wordmark" href="/" aria-label="Rébecca Studio">RÉBECCA</a>
-    <nav class="nav" aria-label="ניווט">
-      <a href="#products" data-i18n="nav_products">מוצרים</a>
-      <a href="#workshops" data-i18n="nav_workshops">סדנאות</a>
-      <a href="#about" data-i18n="nav_about">אודות</a>
+  <header class="topbar" id="top">
+    <div class="tb-contact" aria-label="יצירת קשר">
+      <a class="tb-btn wa" id="tbWa" target="_blank" rel="noopener" data-i18n-aria="whatsapp" aria-label="וואטסאפ">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.5c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.6 1.5c.1.2 0 .5-.1.6l-.5.6c.6 1.1 1.5 2 2.6 2.6l.6-.5c.2-.1.4-.2.6-.1l1.5.6c.3.1.4.3.4.5v.5c0 .3 0 .6-.5.8-.6.3-1.4.5-2.4.1-2-.8-3.6-2.4-4.4-4.4-.4-1-.2-1.8.1-2.3Z" fill="currentColor"/></svg>
+        <span data-i18n="whatsapp">וואטסאפ</span></a>
+      <a class="tb-btn" id="tbTel" data-i18n-aria="call" aria-label="טלפון">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5h2.6l1.4 4-2 1.4a11 11 0 0 0 6.6 6.6l1.4-2 4 1.4v2.6a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7a2 2 0 0 1 2-2.2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span data-i18n="call">טלפון</span></a>
+      <a class="tb-btn" id="tbMail" data-i18n-aria="email" aria-label="מייל">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m4 6.5 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span data-i18n="email">מייל</span></a>
+    </div>
+    <a class="tb-brand" href="/" aria-label="Rébecca Studio">
+      <span class="tb-mark">RÉBECCA</span>
+      <span class="tb-sub">HANDMADE NATURAL SOAP &amp; CANDLES</span>
+      <span class="tb-tag" id="heroTag">סבונים ונרות בעבודת יד, מחומרים טבעיים</span>
+    </a>
+    <div class="tb-tools">
       <button class="btn-lang" id="langBtn" type="button" data-i18n="lang_btn">English</button>
       <button class="btn-cart" id="cartBtn" type="button" data-i18n-aria="cart" aria-label="סל ההזמנה">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9 7a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
         <span class="cart-count" id="cartCount" hidden>0</span>
       </button>
+    </div>
+    <nav class="tb-nav" aria-label="ניווט">
+      <a href="#products" data-i18n="nav_products">מוצרים</a>
+      <a href="#workshops" data-i18n="nav_workshops">סדנאות</a>
+      <a href="#about" data-i18n="nav_about">אודות</a>
     </nav>
   </header>
 
   <main id="main">
-    <section class="hero">
-      <h1 class="hero-mark">RÉBECCA</h1>
-      <p class="hero-sub">HANDMADE NATURAL SOAP &amp; CANDLES</p>
-      <p class="hero-tag" id="heroTag">סבונים ונרות בעבודת יד, מחומרים טבעיים</p>
-    </section>
-
     <section class="products" id="products" aria-labelledby="productsTitle">
       <h2 class="section-title" id="productsTitle" data-i18n="products_title">המוצרים שלנו</h2>
       <div class="filters" role="group" id="filters">
@@ -88,13 +99,6 @@
     </p>
     <p class="footer-copy">© <span id="year"></span> Rébecca Studio · <span data-i18n="footer_rights">כל הזכויות שמורות</span></p>
   </footer>
-
-  <!-- floating contact pill -->
-  <div class="pill" id="pill">
-    <a class="pill-btn" id="pillWa" target="_blank" rel="noopener"><span data-i18n="whatsapp">וואטסאפ</span></a>
-    <a class="pill-btn" id="pillMail"><span data-i18n="email">מייל</span></a>
-    <a class="pill-btn" id="pillTel"><span data-i18n="call">טלפון</span></a>
-  </div>
 
   <!-- product dialog -->
   <dialog class="modal" id="productDlg" aria-labelledby="pdName">
