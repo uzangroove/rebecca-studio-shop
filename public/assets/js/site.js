@@ -111,9 +111,10 @@
     const ann = pick(s, "announcement"), annEl = $("#announce");
     annEl.textContent = ann; annEl.hidden = !ann;
     const wa = s.whatsapp || RS_CONFIG.DEFAULT_WHATSAPP;
-    $("#tbWa").href = waLink(wa, "");
-    $("#tbMail").href = `mailto:${s.email || ""}`;
-    $("#tbTel").href = `tel:${(s.phone || "").replace(/[^0-9+]/g, "")}`;
+    const setHref = (sel, url) => { const el = $(sel); if (el) el.href = url; };
+    setHref("#tbWa", waLink(wa, ""));
+    setHref("#tbMail", `mailto:${s.email || ""}`);
+    setHref("#tbTel", `tel:${(s.phone || "").replace(/[^0-9+]/g, "")}`);
     $("#footerContact").innerHTML = [
       s.phone ? `<a href="tel:${esc(s.phone.replace(/[^0-9+]/g, ""))}" dir="ltr">${esc(s.phone)}</a>` : "",
       s.email ? `<a href="mailto:${esc(s.email)}">${esc(s.email)}</a>` : "",
@@ -274,7 +275,7 @@
 
   /* compact banner after scrolling */
   const topbar = $("#top");
-  const onScroll = () => topbar.classList.toggle("compact", scrollY > 60);
+  const onScroll = () => topbar && topbar.classList.toggle("compact", scrollY > 60);
   addEventListener("scroll", onScroll, { passive: true }); onScroll();
 
   /* decorative cursor ring on desktop */
