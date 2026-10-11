@@ -75,6 +75,9 @@
   function renderProducts() {
     const q = S.q.trim().toLowerCase();
     const items = S.products.filter(p => (S.cat === "all" || p.category === S.cat) && (!q || [p.name_he, p.name_en, p.short_he].join(" ").toLowerCase().includes(q)));
+    const noPrice = S.products.filter(p => p.price == null).length, noDesc = S.products.filter(p => !p.desc_he).length;
+    $("#todo").innerHTML = (noPrice || noDesc) ? `<b>מה נשאר להשלים:</b> ${noPrice ? `${noPrice} מוצרים בלי מחיר` : ""}${noPrice && noDesc ? " · " : ""}${noDesc ? `${noDesc} בלי תיאור מלא` : ""}. לחצי "עריכה" על כל מוצר כדי להשלים.` : "";
+    $("#todo").hidden = !(noPrice || noDesc);
     $("#prodList").innerHTML = items.length ? items.map(p => `
       <div class="row ${p.published ? "" : "off"}">
         ${p.images && p.images[0] ? `<img src="${esc(abs(p.images[0]))}" alt="" loading="lazy">` : `<div class="noimg"></div>`}
@@ -82,7 +85,8 @@
           <h3>${esc(p.name_he)}</h3>
           <div class="sub">${esc(CAT[p.category])} · ${esc(money(p.price))}
             ${p.published ? `<span class="tag ok">באתר</span>` : `<span class="tag">מוסתר</span>`}
-            ${p.sold_out ? `<span class="tag bad">אזל</span>` : ""}${p.featured ? ` <span class="tag">מומלץ</span>` : ""}</div>
+            ${p.sold_out ? `<span class="tag bad">אזל</span>` : ""}${p.featured ? ` <span class="tag">מומלץ</span>` : ""}
+            ${p.price == null ? ` <span class="tag warn">חסר מחיר</span>` : ""}${!p.desc_he ? ` <span class="tag warn">חסר תיאור</span>` : ""}</div>
           <div class="acts">
             <button class="chip" data-edit="${p.id}" type="button">עריכה</button>
             <button class="chip" data-toggle="published" data-id="${p.id}" type="button">${p.published ? "הסתרה" : "הצגה באתר"}</button>
