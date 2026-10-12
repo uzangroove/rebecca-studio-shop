@@ -10,6 +10,7 @@
 
   let ST = null; // "פרטי ייצור" module (studio.js)
   let SG = null; // smart suggestions (suggest.js)
+  let DM = null; // "מאגרים" — all back-office tables (data.js)
   const S = { products: [], workshops: [], signups: [], settings: {}, cat: "all", q: "", editing: null, editImgs: [], wsEditing: null, wsImg: null, share: null, fmt: "square", inbox: [], inboxFilter: "new", pendingInbox: [] };
 
   function toast(m, ms = 2400) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), ms); }
@@ -26,6 +27,13 @@
     $("#login").hidden = true; $("#app").hidden = false;
     if (window.RSStudio && !ST) { try { ST = window.RSStudio(sb, { $, $$, esc, toast }); } catch (e) { console.warn("studio", e); } }
     if (window.RSSuggest && ST && !SG) { try { SG = window.RSSuggest(sb, { $, esc, toast, images: () => S.editImgs, settings: () => S.settings, studio: ST, abs }); } catch (e) { console.warn("suggest", e); } }
+    if (window.RSData && !DM) {
+      try {
+        DM = window.RSData(sb, { $, esc, toast, fail,
+          openProduct: p => openProduct(p ? S.products.find(x => x.id === p.id) || p : null),
+          onChange: () => { if (ST) ST.load(); } });
+      } catch (e) { console.warn("data", e); }
+    }
     await Promise.all([loadProducts(), loadWorkshops(), loadSettings(), loadSignups(), loadInbox()]);
     if (ST) ST.load().then(ok => { if (ok) renderProducts(); });
   }
@@ -45,6 +53,7 @@
     $$(".tab").forEach(x => x.classList.toggle("on", x === b));
     $$(".view").forEach(v => v.hidden = v.dataset.view !== b.dataset.tab);
     if (b.dataset.tab === "signups") { try { localStorage.setItem("rs_seen_signups", new Date().toISOString()); } catch (e) {} updateBadge(); }
+    if (b.dataset.tab === "data" && DM) DM.show();
     scrollTo(0, 0);
   });
   $$("dialog [data-close]").forEach(b => b.onclick = () => b.closest("dialog").close());
@@ -76,6 +85,7 @@
     const { data, error } = await sb.from("products").select("*").order("category").order("sort_order").order("created_at");
     if (error) return fail(error);
     S.products = data; renderProducts();
+    if (DM) DM.refresh("products");
   }
   function renderProducts() {
     const q = S.q.trim().toLowerCase();
