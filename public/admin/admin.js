@@ -8,6 +8,7 @@
   const CAT = { soap: "סבונים", candle: "נרות", bundle: "מארזים", other: "עוד" };
   const SITE = location.origin;
 
+  let ST = null; // "פרטי ייצור" module (studio.js)
   const S = { products: [], workshops: [], signups: [], settings: {}, cat: "all", q: "", editing: null, editImgs: [], wsEditing: null, wsImg: null, share: null, fmt: "square", inbox: [], inboxFilter: "new", pendingInbox: [] };
 
   function toast(m, ms = 2400) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), ms); }
@@ -22,7 +23,9 @@
     const { data: ok, error } = await sb.rpc("is_admin");
     if (error || !ok) { await sb.auth.signOut(); return showLogin("למשתמש הזה אין הרשאת ניהול."); }
     $("#login").hidden = true; $("#app").hidden = false;
+    if (window.RSStudio && !ST) { try { ST = window.RSStudio(sb, { $, $$, esc, toast }); } catch (e) { console.warn("studio", e); } }
     await Promise.all([loadProducts(), loadWorkshops(), loadSettings(), loadSignups(), loadInbox()]);
+    if (ST) ST.load().then(ok => { if (ok) renderProducts(); });
   }
   function showLogin(msg) { $("#app").hidden = true; $("#login").hidden = false; $("#loginMsg").textContent = msg || ""; }
   $("#loginForm").onsubmit = async e => {
@@ -74,7 +77,7 @@
   }
   function renderProducts() {
     const q = S.q.trim().toLowerCase();
-    const items = S.products.filter(p => (S.cat === "all" || p.category === S.cat) && (!q || [p.name_he, p.name_en, p.short_he].join(" ").toLowerCase().includes(q)));
+    const items = S.products.filter(p => (S.cat === "all" || p.category === S.cat) && (!q || [p.name_he, p.name_en, p.short_he, ST && ST.skuOf(p.id)].join(" ").toLowerCase().includes(q)));
     const noPrice = S.products.filter(p => p.price == null).length, noDesc = S.products.filter(p => !p.desc_he).length;
     $("#todo").innerHTML = (noPrice || noDesc) ? `<b>מה נשאר להשלים:</b> ${noPrice ? `${noPrice} מוצרים בלי מחיר` : ""}${noPrice && noDesc ? " · " : ""}${noDesc ? `${noDesc} בלי תיאור מלא` : ""}. לחצי "עריכה" על כל מוצר כדי להשלים.` : "";
     $("#todo").hidden = !(noPrice || noDesc);
@@ -86,6 +89,7 @@
           <div class="sub">${esc(CAT[p.category])} · ${esc(money(p.price))}
             ${p.published ? `<span class="tag ok">באתר</span>` : `<span class="tag">מוסתר</span>`}
             ${p.sold_out ? `<span class="tag bad">אזל</span>` : ""}${p.featured ? ` <span class="tag">מומלץ</span>` : ""}
+            ${ST && ST.skuOf(p.id) ? ` <span class="tag" dir="ltr">${esc(ST.skuOf(p.id))}</span>` : ""}
             ${p.price == null ? ` <span class="tag warn">חסר מחיר</span>` : ""}${!p.desc_he ? ` <span class="tag warn">חסר תיאור</span>` : ""}</div>
           <div class="acts">
             <button class="chip" data-edit="${p.id}" type="button">עריכה</button>
@@ -150,6 +154,7 @@
     ["published", "sold_out", "featured"].forEach(k => f[k].checked = !!v[k]);
     $("#uploadMsg").textContent = "";
     renderEditImgs();
+    if (ST) ST.open(p, v.category).catch(e => console.warn("studio open", e));
     $("#prodDlg").showModal();
   }
   function renderEditImgs() {
@@ -204,7 +209,8 @@
     const q = selfId ? sb.from("products").update(row).eq("id", selfId).select("id").single() : sb.from("products").insert(row).select("id").single();
     const { data: saved, error } = await q;
     btn.disabled = false;
-    if (error) return fail(error);
+    if (error) { btn.disabled = false; return fail(error); }
+    if (ST) { btn.disabled = true; try { await ST.save(saved.id); } catch (e2) { console.warn("studio save", e2); } btn.disabled = false; }
     const used = S.pendingInbox.filter(id => S.inbox.some(m => m.id === id && row.images.includes(m.url)));
     if (used.length) {
       const { error: e2 } = await sb.from("media_inbox").update({ status: "used", product_id: saved.id }).in("id", used);
