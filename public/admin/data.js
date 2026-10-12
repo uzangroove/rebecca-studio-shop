@@ -20,6 +20,7 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
     pdStatus: ["טיוטה", "מאושר", "באתר", "לא למכירה"]
   };
   const PCAT = { soap: "סבונים", candle: "נרות", bundle: "מארזים", other: "עוד" };
+  const FA_HE = { lauric: "לאורית", myristic: "מיריסטית", palmitic: "פלמיטית", stearic: "סטארית", ricinoleic: "ריצינולאית", oleic: "אולאית", linoleic: "לינולאית", linolenic: "לינולנית" };
 
   /* ---------------- lookups for linked fields ---------------- */
   const REF = {
@@ -62,7 +63,10 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
           F("use_in", "שימוש", "enum", { o: EN.useIn }), F("approval", "אישור", "enum", { o: EN.approval, ...req }),
           F("preferred_supplier_id", "ספק מועדף", "ref", { ref: "suppliers" }), F("on_shelf", "יש במלאי", "bool")] },
         { n: "מידע מקצועי", f: [F("inci", "INCI", "text", ltr), F("inci_soap", "INCI בסבון", "text", ltr), F("usage_range", "טווח שימוש"),
-          F("properties", "תכונות", "long"), F("suits", "מתאים ל…", "long"), F("caution", "זהירות", "long"), F("notes", "הערות", "long")] }
+          F("properties", "תכונות", "long"), F("suits", "מתאים ל…", "long"), F("caution", "זהירות", "long"), F("notes", "הערות", "long")] },
+        { n: "נתונים למחשבון הסבון", hint: "לשמנים, חמאות ושעוות שנכנסים לסבון. ערך סודה (SAP) במ״ג KOH לגרם, כמו ב-SoapCalc. חומר בלי ערך סודה לא יחושב במחשבון.",
+          f: [F("sap_koh", "ערך סודה (SAP KOH)", "num", { ph: "190" }), F("soap_data", "מקור הנתונים", "enum", { o: ["מאומת", "ספרותי"], hint: "מאומת = נבדק מול Soapmaking Friend." }),
+            F("iodine", "ערך יוד", "num"), F("ins", "INS", "num"), F("fatty_acids", "חומצות שומן (%)", "fa")] }
       ],
       defaults: { approval: "ממתין", on_shelf: false },
       related: [{ t: "recipes", l: "במתכונים", via: { t: "recipe_lines", fk: "material_id", pick: "recipe_id" } },
@@ -78,15 +82,17 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
       secs: [
         { n: "פרטים", f: [F("name", "שם המתכון", "text", req), F("method", "שיטה", "enum", { o: EN.method }), F("author", "מחבר"),
           F("recipe_date", "תאריך", "date"), F("source", "מקור"), F("source_file", "קישור למקור", "text", ltr)] },
-        { n: "כמויות", f: [F("oils_g", "סך השמנים (גרם)", "num"), F("superfat", "שומן עודף (%)", "pct"), F("lye_type", "סוג בסיס", "enum", { o: EN.lye }),
-          F("lye_purity", "טוהר הבסיס (%)", "pct"), F("lye_g", "בסיס (גרם)", "num"), F("liquid_g", "נוזלים (גרם)", "num"),
-          F("lye_concentration", "ריכוז הבסיס (%)", "pct"), F("liquid_lye_ratio", "יחס נוזל:בסיס", "text", ltr), F("fragrance_g", "ריח (גרם)", "num"),
-          F("batch_g", "משקל המנה (גרם)", "num")],
-          hint: "כמות הבסיס לא מחושבת כאן מחדש. אם משנים שמנים, כדאי לבדוק את הסודה במחשבון (Soapmaking Friend או מחשבון הסבון באתר)." },
-        { n: "תכונות (מ-Soapmaking Friend)", f: [F("qualities", "תכונות הסבון", "json"), F("fatty_acids", "חומצות שומן", "json")] },
+        { n: "חישוב", f: [F("oils_g", "סך השמנים (גרם)", "num", { hint: "שינוי הסך משנה את הגרמים של כל השמנים לפי האחוזים." }), F("superfat", "שומן עודף (%)", "pct"), F("lye_type", "סוג בסיס", "enum", { o: EN.lye }),
+          F("lye_purity", "טוהר הבסיס (%)", "pct", { hint: "100 = כמו Soapmaking Friend. לסודה של 99% אפשר לרשום 99." })] },
+        { n: "כמויות שנשמרות עם המתכון", f: [F("lye_g", "בסיס (גרם)", "num", { out: true }), F("liquid_g", "נוזלים (גרם)", "num", { out: true }),
+          F("lye_concentration", "ריכוז הבסיס (%)", "pct", { out: true }), F("liquid_lye_ratio", "יחס נוזל:בסיס", "text", { ...ltr, out: true }), F("fragrance_g", "ריח (גרם)", "num", { out: true }),
+          F("batch_g", "משקל המנה (גרם)", "num", { out: true })],
+          hint: "מחושב אוטומטית במחשבון שלמעלה." },
         { n: "הערות", f: [F("notes", "הערות, ריחות ותוספים", "long", { rows: 4 })] }
       ],
-      defaults: { method: "CP — תהליך קר", lye_type: "NaOH", lye_purity: 0.99, superfat: 0.05, source: "סטודיו" },
+      defaults: { method: "CP — תהליך קר", lye_type: "NaOH", lye_purity: 1, superfat: 0.05, source: "סטודיו", oils_g: 1000 },
+      calc: true, calcAfter: 1,
+      beforeSave(row) { if (window.RSCalcUI) window.RSCalcUI.beforeSave(row); },
       lines: {
         t: "recipe_lines", fk: "recipe_id", seq: "sort_order", title: "רכיבי המתכון", after: 0,
         cols: [F("material_id", "רכיב", "ref", { ref: "materials", w: 3, ...req }), F("stage", "שלב", "enum", { o: EN.stage, w: 2 }),
@@ -102,7 +108,7 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
           const oil = lines.filter(l => l.stage === "שמנים וחמאות");
           const p = oil.reduce((s, l) => s + (num(l.pct_of_oils) || 0), 0), g = oil.reduce((s, l) => s + (num(l.grams) || 0), 0);
           const ok = Math.abs(p - 1) < 0.002;
-          return `<span class="tag ${ok ? "ok" : "warn"}">שמנים: ${fmtN(p * 100, 1)}%${ok ? "" : " (צריך 100%)"}</span> <span class="tag">${fmtN(g, 1)} גרם</span>`;
+          return `<span class="tag ${ok ? "ok" : "warn"}">שמנים: ${fmtN(p * 100, 1)}%${ok ? "" : " (צריך 100%)"}</span> <span class="tag">${fmtN(g, 1)} גרם</span>${ok || !g ? "" : ` <button type="button" class="chip" id="dmBalance">איזון ל-100% לפי הגרמים</button>`}`;
         }
       },
       related: [{ t: "products", l: "מוצרים עם המתכון", via: { t: "product_details", fk: "recipe_id", pick: "product_id" } }, { t: "batches", fk: "recipe_id", l: "אצוות ייצור" }]
@@ -115,7 +121,7 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
       filters: [{ k: "kind", l: "סוג" }, { k: "source", l: "מקור" }],
       secs: [
         { n: "פרטים", f: [F("kind", "סוג", "enum", { o: EN.moldKind, ...req }), F("name", "שם", "text", req), F("material", "חומר"), F("shape", "צורה"),
-          F("cavity_mm", "מידות חלל (מ״מ)", "text", ltr), F("fill_grams", "מילוי לחלל (גרם)", "num"), F("cavities", "מספר חללים", "int"),
+          F("cavity_mm", "מידות חלל (מ״מ)", "text", ltr), F("fill_grams", "משקל מילוי לכל התבנית (גרם)", "num"), F("cavities", "מספר חללים", "int"),
           F("source", "מקור", "enum", { o: EN.moldSrc }), F("fits", "מתאים ל…"), F("in_use", "בשימוש", "bool"), F("for_sale", "למכירה", "bool")] },
         { n: "מחיר", f: [F("cost_ils", "עלות (₪)", "money"), F("price_ils", "מחיר מכירה (₪)", "money"), F("store_product_id", "מוצר בחנות", "ref", { ref: "products" })] },
         { n: "הערות", f: [F("notes", "הערות", "long")] }
@@ -436,19 +442,21 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
       case "int": return `<input type="number" step="1" name="${name}" value="${esc(v ?? "")}"${f.min != null ? ` min="${f.min}"` : ""}${f.max != null ? ` max="${f.max}"` : ""} inputmode="numeric" dir="ltr"${rq}>`;
       case "num": case "money": return `<input name="${name}" value="${esc(v ?? "")}" inputmode="decimal" dir="ltr"${ph}${rq}>`;
       case "pct": return `<input name="${name}" value="${v == null ? "" : esc(round(v * 100, 4))}" inputmode="decimal" dir="ltr"${rq}>`;
+      case "fa": { const o = v || {}; return `<div class="dm-fa">${["lauric", "myristic", "palmitic", "stearic", "ricinoleic", "oleic", "linoleic", "linolenic"].map(k => `<label><span>${FA_HE[k]}</span><input name="${name}__${k}" value="${esc(o[k] ?? "")}" inputmode="decimal" dir="ltr"></label>`).join("")}</div>`; }
       case "json": return `<div class="dm-json">${v && Object.keys(v).length ? Object.entries(v).map(([k, x]) => `<span class="tag">${esc(k)}: ${esc(x)}</span>`).join(" ") : `<span class="muted">—</span>`}</div>`;
       default: return `<input name="${name}" value="${esc(v ?? "")}"${dir}${ph}${f.max ? ` maxlength="${f.max}"` : ""}${rq}>`;
     }
   }
   function fieldHtml(f, v, isNew) {
     if (f.t === "bool") return `<div class="dm-f dm-bool">${input(f, v)}</div>`;
-    const locked = (f.keyField && !isNew) || (f.lockOnEdit && !isNew);
-    const body = locked ? `<input value="${esc(v ?? "")}" readonly dir="${f.dir || "auto"}" class="dm-ro"><input type="hidden" name="f_${f.k}" value="${esc(v ?? "")}">` : input(f, v);
-    return `<label class="dm-f ${f.t === "long" || f.t === "json" ? "dm-full" : ""}">${esc(f.l)}${f.req ? " *" : ""}${body}${f.hint ? `<small class="muted">${esc(f.hint)}</small>` : ""}</label>`;
+    const locked = (f.keyField && !isNew) || (f.lockOnEdit && !isNew) || (f.out && S.edit && S.edit.cfg.calc && window.SoapCalc);
+    const body = f.out && locked ? input(f, v).replace(/^<input /, `<input readonly class="dm-ro" `) : locked ? `<input value="${esc(v ?? "")}" readonly dir="${f.dir || "auto"}" class="dm-ro"><input type="hidden" name="f_${f.k}" value="${esc(v ?? "")}">` : input(f, v);
+    return `<label class="dm-f ${f.t === "long" || f.t === "json" || f.t === "fa" ? "dm-full" : ""}">${esc(f.l)}${f.req ? " *" : ""}${body}${f.hint ? `<small class="muted">${esc(f.hint)}</small>` : ""}</label>`;
   }
   function readField(f, form) {
-    const el = form.elements["f_" + f.k]; if (!el) return undefined;
+    const el = form.elements["f_" + f.k]; if (!el && f.t !== "fa") return undefined;
     if (f.t === "json") return undefined;
+    if (f.t === "fa") { const o = {}; let any = false; ["lauric", "myristic", "palmitic", "stearic", "ricinoleic", "oleic", "linoleic", "linolenic"].forEach(k => { const e = form.elements[`f_${f.k}__${k}`]; const n = e ? num(e.value) : null; o[k] = n == null ? 0 : n; if (n != null) any = true; }); return any ? o : null; }
     if (f.t === "bool") return el.checked;
     const s = String(el.value).trim();
     if (s === "") return null;
@@ -474,7 +482,7 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
     S.edit = { cfg, isNew, key, row };
     S.removed = []; S.dirty = false;
     S.lines = [];
-    try { if (cfg.lines) await Promise.all(cfg.lines.cols.filter(c => c.ref).map(c => loadRef(c.ref))); await Promise.all(allFields(cfg).filter(f => f.ref).map(f => loadRef(f.ref))); }
+    try { if (cfg.lines) await Promise.all(cfg.lines.cols.filter(c => c.ref).map(c => loadRef(c.ref))); await Promise.all(allFields(cfg).filter(f => f.ref).map(f => loadRef(f.ref))); if (cfg.calc && window.RSCalcUI) await window.RSCalcUI.load(sb); }
     catch (e) { return fail(e); }
     if (cfg.lines) {
       if (copyFrom && copyFrom.__lines) S.lines = copyFrom.__lines.map(l => { const c = { ...l }; delete c.id; delete c[cfg.lines.fk]; return c; });
@@ -485,16 +493,20 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
       }
     }
     const title = isNew ? (copyFrom ? `${cfg.label}: העתק חדש` : `${cfg.label}: חדש`) : (cfg.title ? cfg.title(row) : key);
-    $("#dmDlgTitle").textContent = title;
+    $("#dmDlgTitle").textContent = S.quick && isNew ? "מחשבון סבון" : title;
+    $("#dmSave").textContent = S.quick && isNew ? "שמירה כמתכון" : "שמירה";
+    S.quick = false;
     const auto = !!(cfg.seq || cfg.doc || cfg.newKey);
     const keyNote = !auto ? "" : isNew ? `<p class="hint" style="margin:0">המספר יינתן אוטומטית בשמירה.</p>` : `<p class="dm-key" dir="ltr">${esc(key)}</p>`;
     const secHtml = s => `<fieldset><legend>${esc(s.n)}</legend>${s.hint ? `<p class="hint" style="margin:0">${esc(s.hint)}</p>` : ""}<div class="dm-grid">${s.f.map(f => fieldHtml(f, row[f.k], isNew)).join("")}</div></fieldset>`;
     const linesHtml = cfg.lines ? `<fieldset class="dm-lines"><legend>${esc(cfg.lines.title)}</legend><div id="dmLines"></div><button type="button" class="btn" id="dmAddLine">+ הוספת שורה</button><div class="dm-foot" id="dmFoot"></div></fieldset>` : "";
-    const at = cfg.lines && cfg.lines.after != null ? cfg.lines.after + 1 : cfg.secs.length;
-    $("#dmBody").innerHTML = keyNote + cfg.secs.slice(0, at).map(secHtml).join("") + linesHtml + cfg.secs.slice(at).map(secHtml).join("") +
+    const calcHtml = cfg.calc && window.RSCalcUI ? window.RSCalcUI.html() : "";
+    const linesAt = cfg.lines && cfg.lines.after != null ? cfg.lines.after : cfg.secs.length - 1;
+    $("#dmBody").innerHTML = keyNote + cfg.secs.map((sec, i) => secHtml(sec) + (i === linesAt ? linesHtml : "") + (i === cfg.calcAfter ? calcHtml : "")).join("") +
       (!isNew && cfg.related ? `<fieldset><legend>קשור לרשומה</legend><div class="chips" id="dmRel"><span class="muted">בודק…</span></div></fieldset>` : "") +
       `<div class="dm-actions">${!isNew ? `<button type="button" class="btn" id="dmDup">שכפול</button>` : ""}${!isNew ? `<button type="button" class="btn danger" id="dmDel">מחיקה</button>` : ""}</div>`;
     if (cfg.lines) { renderLines(); updateFoot(); }
+    if (cfg.calc && window.RSCalcUI) window.RSCalcUI.open(row, calcApi);
     if (!isNew && cfg.related) loadRelated(cfg, key);
     $("#dmDlg").showModal();
     $("#dmBody").scrollTop = 0;
@@ -546,19 +558,42 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
   $("#dmDlg").addEventListener("click", async e => {
     if (!S.edit) return;
     if (e.target.closest("#dmAddLine")) {
-      const lc = S.edit.cfg.lines; S.lines.push(lc.blank ? lc.blank() : {}); S.dirty = true; renderLines(); updateFoot();
+      const lc = S.edit.cfg.lines; S.lines.push(lc.blank ? lc.blank() : {}); S.dirty = true; renderLines(); updateFoot(); recalcIf();
       const last = $(`.dm-line[data-li="${S.lines.length - 1}"] select, .dm-line[data-li="${S.lines.length - 1}"] input`); if (last) last.focus();
       return;
     }
     const d = e.target.closest("[data-ldel]");
-    if (d) { const i = Number(d.dataset.ldel), l = S.lines[i]; if (l.id) S.removed.push(l.id); S.lines.splice(i, 1); S.dirty = true; renderLines(); updateFoot(); return; }
+    if (d) { const i = Number(d.dataset.ldel), l = S.lines[i]; if (l.id) S.removed.push(l.id); S.lines.splice(i, 1); S.dirty = true; renderLines(); updateFoot(); recalcIf(); return; }
+    if (e.target.closest("#dmBalance")) { balanceOils(); return; }
     const rel = e.target.closest("[data-rel]");
     if (rel) { const j = S.relJumps[Number(rel.dataset.rel)]; $("#dmDlg").close(); S.edit = null; switchTable(j.t, j.jump); return; }
     if (e.target.closest("#dmDup")) return duplicate();
     if (e.target.closest("#dmDel")) return remove();
   });
+  $("#dmDlg").addEventListener("input", () => { if (S.edit && S.edit.cfg.calc && window.RSCalcUI) window.RSCalcUI.recalc(); });
   $("#dmCancel").addEventListener("click", () => { if (S.dirty && !confirm("לצאת בלי לשמור את השינויים?")) return; S.edit = null; $("#dmDlg").close(); });
   $("#dmDlg").addEventListener("cancel", e => { if (S.dirty && !confirm("לצאת בלי לשמור את השינויים?")) e.preventDefault(); else S.edit = null; });
+
+  function recalcIf() { if (S.edit && S.edit.cfg.calc && window.RSCalcUI) window.RSCalcUI.recalc(); }
+  function balanceOils() {
+    const oil = S.lines.filter(l => l.stage === "שמנים וחמאות" && num(l.grams) > 0), sum = oil.reduce((a, l) => a + num(l.grams), 0);
+    if (!sum) return;
+    oil.forEach(l => { l.pct_of_oils = round(num(l.grams) / sum, 4); });
+    $("#dmForm").elements.f_oils_g.value = round(sum, 2);
+    S.lines.forEach((_, i) => syncLineInputs(i)); S.dirty = true; updateFoot(); recalcIf();
+  }
+  /* the calculator UI (calcui.js) reads and writes the open recipe through this */
+  const calcApi = {
+    lines: () => S.lines, form: () => $("#dmForm"), values: () => formValues(),
+    scale(k) {
+      const f = $("#dmForm"), o = num(f.elements.f_oils_g.value);
+      S.lines.forEach(l => { if (num(l.grams) != null) l.grams = round(num(l.grams) * k, 2); });
+      const sum = S.lines.filter(l => l.stage === "שמנים וחמאות").reduce((a, l) => a + (num(l.grams) || 0), 0);
+      f.elements.f_oils_g.value = round(sum || (o || 0) * k, 2);
+      S.lines.forEach((_, i) => syncLineInputs(i)); updateFoot(); S.dirty = true;
+    },
+    refs: t => (S.refs[t] || { rows: [] }).rows, esc, toast
+  };
 
   /* ---------- related records ---------- */
   async function loadRelated(cfg, key) {
@@ -693,6 +728,7 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
   /* ---------------- public ---------------- */
   return {
     show() { if (!S.loaded[S.t]) loadTable(); else render(); },
+    quickCalc() { if (S.t !== "recipes") switchTable("recipes"); else if (!S.loaded.recipes) loadTable(); S.t = "recipes"; S.quick = true; openRecord(null); },
     refresh(t) { if (t) S.refs[t] = null; if (S.loaded[S.t] && (!t || t === S.t || TABLES[S.t].special === t)) loadTable(); },
     tables: TABLES
   };

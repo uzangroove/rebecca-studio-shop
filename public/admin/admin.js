@@ -51,7 +51,9 @@
   /* ================= tabs ================= */
   $$(".tab").forEach(b => b.onclick = () => {
     $$(".tab").forEach(x => x.classList.toggle("on", x === b));
-    $$(".view").forEach(v => v.hidden = v.dataset.view !== b.dataset.tab);
+    const view = b.dataset.tab === "calc" ? "data" : b.dataset.tab;
+    $$(".view").forEach(v => v.hidden = v.dataset.view !== view);
+    if (b.dataset.tab === "calc" && DM) DM.quickCalc();
     if (b.dataset.tab === "signups") { try { localStorage.setItem("rs_seen_signups", new Date().toISOString()); } catch (e) {} updateBadge(); }
     if (b.dataset.tab === "data" && DM) DM.show();
     scrollTo(0, 0);
