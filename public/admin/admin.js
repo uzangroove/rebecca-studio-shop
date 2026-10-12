@@ -46,7 +46,7 @@
     if (error) { $("#loginMsg").textContent = "המייל או הסיסמה שגויים."; return; }
     boot();
   };
-  $("#logoutBtn").onclick = async () => { await sb.auth.signOut(); showLogin(); };
+  $("#logoutBtn").onclick = $("#logoutBtn2").onclick = async () => { await sb.auth.signOut(); showLogin(); };
 
   /* ================= tabs ================= */
   $$(".tab").forEach(b => b.onclick = () => {
@@ -246,7 +246,7 @@
   /* ================= inbox: images sent from the photo studio ================= */
   function applyStudioLink() {
     const u = (S.settings.photo_studio_url || "").trim();
-    ["#studioLink", "#studioLink2"].forEach(sel => { const a = $(sel); if (!a) return; a.hidden = !u; if (u) a.href = u; });
+    ["#studioLink", "#studioLink2", "#studioLink3"].forEach(sel => { const a = $(sel); if (!a) return; a.hidden = !u; if (u) a.href = u; });
   }
   async function loadInbox() {
     const { data, error } = await sb.from("media_inbox").select("*").order("created_at", { ascending: false }).limit(200);
