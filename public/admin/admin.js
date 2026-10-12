@@ -9,6 +9,7 @@
   const SITE = location.origin;
 
   let ST = null; // "פרטי ייצור" module (studio.js)
+  let SG = null; // smart suggestions (suggest.js)
   const S = { products: [], workshops: [], signups: [], settings: {}, cat: "all", q: "", editing: null, editImgs: [], wsEditing: null, wsImg: null, share: null, fmt: "square", inbox: [], inboxFilter: "new", pendingInbox: [] };
 
   function toast(m, ms = 2400) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), ms); }
@@ -24,6 +25,7 @@
     if (error || !ok) { await sb.auth.signOut(); return showLogin("למשתמש הזה אין הרשאת ניהול."); }
     $("#login").hidden = true; $("#app").hidden = false;
     if (window.RSStudio && !ST) { try { ST = window.RSStudio(sb, { $, $$, esc, toast }); } catch (e) { console.warn("studio", e); } }
+    if (window.RSSuggest && ST && !SG) { try { SG = window.RSSuggest(sb, { $, esc, toast, images: () => S.editImgs, settings: () => S.settings, studio: ST, abs }); } catch (e) { console.warn("suggest", e); } }
     await Promise.all([loadProducts(), loadWorkshops(), loadSettings(), loadSignups(), loadInbox()]);
     if (ST) ST.load().then(ok => { if (ok) renderProducts(); });
   }
@@ -154,10 +156,12 @@
     ["published", "sold_out", "featured"].forEach(k => f[k].checked = !!v[k]);
     $("#uploadMsg").textContent = "";
     renderEditImgs();
-    if (ST) ST.open(p, v.category).catch(e => console.warn("studio open", e));
+    if (SG) SG.reset();
+    if (ST) ST.open(p, v.category).then(() => { if (SG) SG.loaded(); }).catch(e => console.warn("studio open", e));
     $("#prodDlg").showModal();
   }
   function renderEditImgs() {
+    if (SG) SG.refreshButtons();
     $("#prodImgs").innerHTML = S.editImgs.map((src, i) => `
       <div class="img-cell">
         <img src="${esc(abs(src))}" alt="">

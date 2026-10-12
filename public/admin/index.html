@@ -9,7 +9,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/admin/manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/admin.css?v=20261012a">
+  <link rel="stylesheet" href="/admin/admin.css?v=20261012b">
 </head>
 <body>
   <!-- ============ LOGIN ============ -->
@@ -181,6 +181,19 @@
           <button class="btn wide" type="button" id="pickInbox">+ בחירה מהתמונות החדשות</button>
           <p class="hint" id="uploadMsg"></p>
         </fieldset>
+        <fieldset class="sg"><legend>הצעות חכמות</legend>
+          <p class="hint" style="margin:0">כדאי למלא קודם את "פרטי ייצור" (מתכון, רכיבים, תגיות) ואת המילים של רבקה. ככה השמות והתיאור מדויקים יותר.</p>
+          <div class="links">
+            <button class="btn" type="button" id="sgAnalyze">ניתוח התמונה הראשית</button>
+            <button class="btn" type="button" id="sgNames">5 הצעות לשם</button>
+            <button class="btn" type="button" id="sgMore" hidden>עוד 5</button>
+            <button class="btn" type="button" id="sgDesc">תיאור והאשטגים</button>
+          </div>
+          <p class="sg-status" id="sgStatus" role="status"></p>
+          <div class="sg-analysis" id="sgAnalysis" hidden></div>
+          <div class="sg-names" id="sgNamesBox"></div>
+          <div class="sg-tags" id="sgTags" hidden></div>
+        </fieldset>
         <label>קטגוריה
           <select name="category" required>
             <option value="soap">סבונים</option><option value="candle">נרות</option>
@@ -348,7 +361,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/js/config.js?v=20261011d"></script>
-  <script src="/admin/studio.js?v=20261012a"></script>
-  <script src="/admin/admin.js?v=20261012a"></script>
+  <script src="/admin/studio.js?v=20261012b"></script>
+  <script src="/admin/suggest.js?v=20261012b"></script>
+  <script src="/admin/admin.js?v=20261012b"></script>
 </body>
 </html>
