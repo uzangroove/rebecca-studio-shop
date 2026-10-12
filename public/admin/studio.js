@@ -11,7 +11,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
     "עונה / אירוע": ["קיץ", "חורף", "אביב", "סתיו", "ראש השנה", "חנוכה", "פסח", "מתנה", "חתונה / כלות", "יום הולדת"]
   };
   const D = { materials: [], byId: {}, recipes: {}, molds: [], price: {}, details: {}, loaded: false };
-  const st = { productId: null, existing: null, mats: [], recipeMats: [], lead: null, leadAuto: true, tags: {}, touched: false };
+  const st = { productId: null, existing: null, mats: [], recipeMats: [], lead: null, leadAuto: true, tags: {}, touched: false, extra: {} };
   const fmt = n => (Math.round(n * 100) / 100).toFixed(2);
 
   /* ---------- data ---------- */
@@ -46,7 +46,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
 
   /* ---------- open / render ---------- */
   async function open(p, category) {
-    st.productId = p ? p.id : null; st.existing = null; st.mats = []; st.recipeMats = []; st.lead = null; st.leadAuto = true; st.tags = {}; st.touched = false;
+    st.productId = p ? p.id : null; st.existing = null; st.mats = []; st.recipeMats = []; st.lead = null; st.leadAuto = true; st.tags = {}; st.touched = false; st.extra = {};
     $("#stSearch").value = ""; $("#stWeight").value = ""; $("#stFree").value = ""; $("#stStatus").value = "טיוטה";
     $("#stRecipe").value = ""; $("#stMold").value = ""; $("#stCat").value = CAT_MAP[category] || "SP";
     $("#studioBox").open = false;
@@ -64,6 +64,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
         $("#stWeight").value = v.unit_weight_g || ""; $("#stFree").value = v.free_text || ""; $("#stStatus").value = v.status || "טיוטה";
         st.tags = JSON.parse(JSON.stringify(v.tags || {})); st.lead = v.lead_material_id || null; st.leadAuto = !st.lead;
         const r = D.recipes[v.recipe_id]; st.recipeMats = r ? r.lines.map(x => x[0]) : [];
+        st.extra = { name_short: v.name_short || null, seo_keywords: v.seo_keywords || [], hashtags: v.hashtags || [], meta_description: v.meta_description || null, photo_analysis: v.photo_analysis || null };
       }
       if (pm.data) { st.mats = pm.data.map(x => x.material_id).filter(id => D.byId[id]); const ld = pm.data.find(x => x.is_lead); if (ld) st.lead = ld.material_id; }
     }
@@ -198,7 +199,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
   /* ---------- save (called after the product row is saved) ---------- */
   async function save(productId) {
     if (!D.loaded) return;
-    const hasData = st.mats.length || $("#stRecipe").value || $("#stMold").value || $("#stFree").value.trim() || $("#stWeight").value || Object.values(st.tags).some(a => a.length);
+    const hasData = Object.keys(st.extra).length || st.mats.length || $("#stRecipe").value || $("#stMold").value || $("#stFree").value.trim() || $("#stWeight").value || Object.values(st.tags).some(a => a.length);
     if (!st.existing && !hasData) return;
     if (st.existing && !st.touched) return;
     let sku = st.existing && st.existing.sku;
@@ -211,7 +212,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
     const row = {
       product_id: productId, sku: sku || null, sku_cat: cat || null, lead_material_id: st.lead || null,
       recipe_id: $("#stRecipe").value || null, mold_tool_id: $("#stMold").value || null,
-      tags: st.tags, free_text: $("#stFree").value.trim() || null, status: $("#stStatus").value || "טיוטה",
+      ...st.extra, tags: st.tags, free_text: $("#stFree").value.trim() || null, status: $("#stStatus").value || "טיוטה",
       unit_weight_g: parseFloat(String($("#stWeight").value).replace(",", ".")) || null,
       cost_estimate: c ? { per_100g: Math.round(c.per100 * 100) / 100, per_unit: c.unit === null ? null : Math.round(c.unit * 100) / 100, missing: c.missing, at: new Date().toISOString().slice(0, 10) } : null
     };
@@ -227,5 +228,37 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
     return row.sku;
   }
 
-  return { load, open, save, skuOf };
+  /* ---------- hooks for the smart suggestions (suggest.js) ---------- */
+  const CAT_LABEL = { SP: "סבון", CN: "נר", ST: "מארז", WS: "סדנה", MO: "תבנית", TL: "כלי עזר", SM: "חותמת", VS: "כלי לנר" };
+  function context() {
+    const r = D.recipes[$("#stRecipe").value];
+    const pct = r ? Object.fromEntries(r.lines) : {};
+    const name = id => D.byId[id] ? D.byId[id].name_he + (D.byId[id].name_en ? " (" + D.byId[id].name_en + ")" : "") : id;
+    const mats = st.mats.map(id => name(id) + (pct[id] ? " " + Math.round(pct[id] * 100) + "%" : ""));
+    const scents = st.mats.filter(id => /^(EO|FO)-/.test(id)).map(id => D.byId[id] ? D.byId[id].name_he : id);
+    const tags = Object.entries(st.tags).filter(([, v]) => v.length).map(([g, v]) => g + ": " + v.join(", "));
+    const a = st.extra.photo_analysis;
+    return [
+      "סוג המוצר: " + (CAT_LABEL[$("#stCat").value] || ""),
+      r ? "מתכון: " + r.name + " — שיטת ייצור: " + (r.method || "לא צוינה") : "",
+      "ריח: " + (scents.join(", ") || "לא נבחר ריח"),
+      "רכיבים: " + (mats.join(", ") || "לא צוינו"),
+      "רכיב מוביל: " + (st.lead && D.byId[st.lead] ? D.byId[st.lead].name_he : "לא צוין"),
+      "התאמה: " + (tags.join(" | ") || "לא צוינה"),
+      a ? "מה רואים בתמונה: צבעים " + (a.colors || []).join(", ") + "; צורה " + (a.shape || "") + "; טכניקה " + (a.technique || "") + "; " + (a.notes || "") : "",
+      "מה רבקה כתבה: " + ($("#stFree").value.trim() || "—")
+    ].filter(Boolean).join("\n");
+  }
+  function visibleMaterials() { return D.materials.filter(m => /^(ADD|CLR|BOT|WAX)-/.test(m.id)).map(m => m.id + "=" + m.name_he).join("; "); }
+  function addMaterials(ids) {
+    let n = 0;
+    for (const id of ids || []) if (D.byId[id] && !st.mats.includes(id)) { st.mats.push(id); n++; }
+    if (n) { st.touched = true; if (!st.lead) { st.lead = defaultLead(); st.leadAuto = true; } renderAll(); }
+    return n;
+  }
+  function setExtra(obj) { Object.assign(st.extra, obj); st.touched = true; }
+  const getExtra = () => st.extra;
+  const ready = () => D.loaded;
+
+  return { load, open, save, skuOf, context, visibleMaterials, addMaterials, setExtra, getExtra, ready };
 };
