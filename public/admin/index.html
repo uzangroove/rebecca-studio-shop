@@ -9,7 +9,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/admin/manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/admin.css?v=20261011d">
+  <link rel="stylesheet" href="/admin/admin.css?v=20261012a">
 </head>
 <body>
   <!-- ============ LOGIN ============ -->
@@ -194,6 +194,34 @@
         <label>שם המוצר<input name="name_he" required maxlength="120"></label>
         <label>תיאור קצר (שורה אחת בכרטיס)<input name="short_he" maxlength="200"></label>
         <label>תיאור מלא (רכיבים, ניחוח, גודל)<textarea name="desc_he" rows="5" maxlength="4000"></textarea></label>
+        <details id="studioBox" class="studio">
+          <summary>פרטי ייצור <small class="muted">(פנימי, לא מוצג באתר)</small> <b class="st-badge" id="stSkuBadge" dir="ltr"></b></summary>
+          <p class="hint" id="stLoading" hidden style="margin:0">טוען את מאגר החומרים…</p>
+          <div class="st-body" id="stBody">
+            <div class="two">
+              <label>סוג למק״ט<select id="stCat"></select></label>
+              <label>מק״ט<input id="stSku" readonly dir="ltr"></label>
+            </div>
+            <div class="two">
+              <label>מתכון<select id="stRecipe"></select></label>
+              <label>תבנית / כלי<select id="stMold"></select></label>
+            </div>
+            <p class="st-warn" id="stWarn" hidden></p>
+            <div class="st-group"><b>רכיבים</b>
+              <p class="hint" style="margin:0">בחירת מתכון מכניסה את השמנים שלו. הקשה על רכיב הופכת אותו לרכיב מוביל (★), שקובע את המק״ט. הקשה נוספת מסירה אותו.</p>
+              <div class="chips" id="stSel"></div>
+              <input type="search" id="stSearch" placeholder="הוספת רכיב: לבנדר, שיאה, פחם…" aria-label="חיפוש רכיב">
+              <div class="chips st-picker" id="stPicker" hidden></div>
+            </div>
+            <div class="st-tags" id="stTags"></div>
+            <div class="two">
+              <label>משקל יחידה (גרם)<input id="stWeight" inputmode="decimal" dir="ltr" placeholder="100"></label>
+              <label>סטטוס פנימי<select id="stStatus"><option>טיוטה</option><option>מאושר</option><option>באתר</option><option>לא למכירה</option></select></label>
+            </div>
+            <div class="st-cost" id="stCost"></div>
+            <label>במילים של רבקה (הערות חופשיות)<textarea id="stFree" rows="3" maxlength="4000"></textarea></label>
+          </div>
+        </details>
         <details>
           <summary>אנגלית (לא חובה — אם ריק, יוצג בעברית)</summary>
           <label>Name<input name="name_en" dir="ltr" maxlength="120"></label>
@@ -203,7 +231,7 @@
         </details>
         <details>
           <summary>מתקדם</summary>
-          <label>כתובת המוצר (באנגלית, אותיות קטנות ומקפים)<input name="slug" dir="ltr" pattern="[a-z0-9-]{2,80}"></label>
+          <label>כתובת המוצר (באנגלית, אותיות קטנות ומקפים)<input name="slug" dir="ltr" pattern="[a-z0-9\-]{2,80}"></label>
           <label>סדר הצגה (מספר קטן = מוקדם)<input name="sort_order" type="number" step="1"></label>
         </details>
         <button class="btn danger wide" type="button" id="prodDelete">מחיקת המוצר</button>
@@ -320,6 +348,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/js/config.js?v=20261011d"></script>
-  <script src="/admin/admin.js?v=20261011d"></script>
+  <script src="/admin/studio.js?v=20261012a"></script>
+  <script src="/admin/admin.js?v=20261012a"></script>
 </body>
 </html>

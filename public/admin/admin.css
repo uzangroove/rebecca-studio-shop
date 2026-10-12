@@ -131,3 +131,24 @@ dialog.sheet::backdrop { background: rgba(0,0,0,.4); }
 @media (max-width: 420px) { .mark.small { font-size: 18px; letter-spacing: .1em; } .top-actions { gap: 6px; } .top-actions .chip { padding: 5px 10px; font-size: 13px; } }
 a.btn { color: var(--ink); }
 .inbox-card .acts button { white-space: nowrap; font-size: 13px; padding: 0 4px; }
+
+/* ---------- פרטי ייצור (studio.js) ---------- */
+details.studio summary { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+details.studio .st-badge { margin-inline-start: auto; font-size: 13px; font-weight: 600; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.st-body { display: flex; flex-direction: column; gap: 12px; }
+.st-body[hidden] { display: none; }
+.st-group { display: flex; flex-direction: column; gap: 8px; }
+.st-group > b { font-size: 14px; }
+.st-tags { display: flex; flex-direction: column; gap: 12px; }
+.st-picker { max-height: 220px; overflow: auto; padding: 8px; border: 1px solid var(--line); border-radius: 12px; }
+.st-picker[hidden] { display: none; }
+.st-from { font-size: 11px; opacity: .75; margin-inline-start: 4px; }
+.chip.on .st-from { opacity: .85; }
+.st-warn { margin: 0; font-size: 14px; color: #8a5a00; background: #fff8e8; border: 1px solid #f0d9a8; border-radius: 10px; padding: 8px 12px; }
+.st-cost { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.st-big { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; }
+.st-big b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.st-cost details { padding: 8px 10px; }
+.st-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.st-table td { padding: 3px 0; border-bottom: 1px solid var(--line); }
+.st-table td + td { text-align: left; direction: ltr; white-space: nowrap; padding-inline-start: 10px; }
