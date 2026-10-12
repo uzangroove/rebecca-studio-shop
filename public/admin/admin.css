@@ -286,3 +286,35 @@ legend { color: var(--green); }
   dialog.sheet { max-width: 900px; }
 }
 @media (min-width: 1024px) and (max-height: 640px) { .tab { min-height: 52px; padding: 6px 4px; } .rail-link { min-height: 44px; } .rail-top { padding-bottom: 8px; } }
+
+/* ---------- מחשבון הסבון (calcui.js) ---------- */
+.tabs { grid-template-columns: repeat(7, 1fr); }
+@media (max-width: 420px) { .tab { font-size: 11px; padding-inline: 2px; } }
+.cc { border-color: #cfdccf; background: linear-gradient(180deg, #fbf8f2, #f4f7f1); }
+.cc-big { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.cc-big > div { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+.cc-big small { color: var(--ink2); font-size: 13px; }
+.cc-big b { font-size: 22px; font-variant-numeric: tabular-nums; color: var(--green); direction: ltr; text-align: right; }
+.cc-big b i { font-style: normal; font-size: 13px; color: var(--ink2); font-weight: 600; }
+.cc-big .cc-lye { border-color: #e5b9ae; background: #fff6f3; }
+.cc-big .cc-lye b { color: var(--bad); }
+.cc-big .cc-total { background: var(--green); border-color: var(--green); }
+.cc-big .cc-total small, .cc-big .cc-total b, .cc-big .cc-total b i { color: var(--cream); }
+.cc-sub { margin: 0; font-size: 14px; color: var(--ink2); }
+.cc-warn { background: #fff8e8; border: 1px solid #f0d9a8; border-radius: 12px; padding: 6px 12px; font-size: 14px; color: #6b4a00; }
+.cc-warn p { margin: 4px 0; }
+.cc-qs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; }
+.cc-q { display: grid; grid-template-columns: 76px 34px 1fr 52px; align-items: center; gap: 8px; font-size: 14px; }
+.cc-q b { font-variant-numeric: tabular-nums; text-align: center; }
+.cc-q small { color: var(--ink2); direction: ltr; text-align: right; font-size: 12px; }
+.cc-q.off b { color: var(--bad); }
+.cc-bar { position: relative; height: 10px; border-radius: 5px; background: #ece5d6; }
+.cc-bar .band { position: absolute; top: 0; bottom: 0; background: #b9d3c1; border-radius: 5px; }
+.cc-bar .dot { position: absolute; top: -3px; width: 10px; height: 16px; border-radius: 3px; background: var(--green); }
+.cc-q.off .cc-bar .dot { background: var(--bad); }
+.cc-more { background: var(--bg); }
+.cc-cost { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.dm-fa { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.dm-fa label { font-size: 13px; }
+.dm-fa input { padding: 7px 8px; }
+@media (max-width: 760px) { .cc-big { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cc-big .cc-total { grid-column: 1 / -1; } .cc-qs { grid-template-columns: 1fr; } .dm-fa { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
