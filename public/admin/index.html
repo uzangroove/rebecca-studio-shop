@@ -9,7 +9,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/admin/manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/admin.css?v=20261012b">
+  <link rel="stylesheet" href="/admin/admin.css?v=20261012c">
 </head>
 <body>
   <!-- ============ LOGIN ============ -->
@@ -92,6 +92,22 @@
         <div class="list" id="signupList"></div>
       </section>
 
+      <!-- data: every back-office table -->
+      <section class="view" data-view="data" hidden>
+        <div class="view-head">
+          <h1 id="dmTitle">מאגרים</h1>
+          <button class="btn solid" type="button" id="dmNew">+ חדש</button>
+        </div>
+        <div class="dm-tables" id="dmTables"></div>
+        <p class="hint" id="dmHint" hidden></p>
+        <div class="toolbar">
+          <input type="search" id="dmSearch" placeholder="חיפוש בכל השדות…" aria-label="חיפוש">
+          <div class="dm-filters" id="dmFilters" hidden></div>
+        </div>
+        <div class="dm-meta" id="dmMeta"></div>
+        <div id="dmList"></div>
+      </section>
+
       <!-- settings -->
       <section class="view" data-view="settings" hidden>
         <div class="view-head"><h1>הגדרות</h1></div>
@@ -155,6 +171,7 @@
       <button class="tab" data-tab="workshops" type="button"><span class="ico">✦</span>סדנאות</button>
       <button class="tab" data-tab="inbox" type="button"><span class="ico">✧</span>תמונות <b class="dot" id="newInbox" hidden></b></button>
       <button class="tab" data-tab="signups" type="button"><span class="ico">✎</span>הרשמות <b class="dot" id="newSignups" hidden></b></button>
+      <button class="tab" data-tab="data" type="button"><span class="ico">☰</span>מאגרים</button>
       <button class="tab" data-tab="settings" type="button"><span class="ico">⚙︎</span>הגדרות</button>
     </nav>
   </div>
@@ -357,12 +374,25 @@
     </div>
   </dialog>
 
+  <!-- ============ DATA RECORD EDITOR (data.js) ============ -->
+  <dialog id="dmDlg" class="sheet">
+    <form id="dmForm" class="form" method="dialog" novalidate>
+      <div class="sheet-head">
+        <button class="chip" type="button" id="dmCancel">ביטול</button>
+        <h2 id="dmDlgTitle">רשומה</h2>
+        <button class="btn solid" type="submit" id="dmSave">שמירה</button>
+      </div>
+      <div class="sheet-body" id="dmBody"></div>
+    </form>
+  </dialog>
+
   <div id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/js/config.js?v=20261011d"></script>
-  <script src="/admin/studio.js?v=20261012b"></script>
-  <script src="/admin/suggest.js?v=20261012b"></script>
-  <script src="/admin/admin.js?v=20261012b"></script>
+  <script src="/admin/studio.js?v=20261012c"></script>
+  <script src="/admin/suggest.js?v=20261012c"></script>
+  <script src="/admin/data.js?v=20261012c"></script>
+  <script src="/admin/admin.js?v=20261012c"></script>
 </body>
 </html>
