@@ -11,6 +11,7 @@
   let ST = null; // "פרטי ייצור" module (studio.js)
   let SG = null; // smart suggestions (suggest.js)
   let DM = null; // "מאגרים" — all back-office tables (data.js)
+  window.RSAdmin = { openTable(t) { if (DM && DM.open) DM.open(t); } }; // used by ui.js (object navigation)
   const S = { products: [], workshops: [], signups: [], settings: {}, cat: "all", q: "", editing: null, editImgs: [], wsEditing: null, wsImg: null, share: null, fmt: "square", inbox: [], inboxFilter: "new", pendingInbox: [] };
 
   function toast(m, ms = 2400) { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), ms); }
