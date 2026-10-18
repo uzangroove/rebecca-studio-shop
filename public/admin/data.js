@@ -728,6 +728,7 @@ window.RSData = function (sb, { $, esc, toast, fail, openProduct, onChange }) {
   /* ---------------- public ---------------- */
   return {
     show() { if (!S.loaded[S.t]) loadTable(); else render(); },
+    open(t) { if (!TABLES[t] || S.t === t) return; S.t = t; S.q = ""; S.f = {}; S.sort = null; S.limit = 150; S.jump = null; const q = $("#dmSearch"); if (q) q.value = ""; try { localStorage.setItem("rs_dm_table", t); } catch (e) {} },
     quickCalc() { if (S.t !== "recipes") switchTable("recipes"); else if (!S.loaded.recipes) loadTable(); S.t = "recipes"; S.quick = true; openRecord(null); },
     refresh(t) { if (t) S.refs[t] = null; if (S.loaded[S.t] && (!t || t === S.t || TABLES[S.t].special === t)) loadTable(); },
     tables: TABLES

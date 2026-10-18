@@ -1,0 +1,127 @@
+/* Rébecca Studio — "בוטיק" admin look (Oct 2026). Everything is scoped to html.boutique,
+   so the classic green/gold look is untouched when it is switched off in Settings. */
+
+/* home tab + home view exist only in the boutique look */
+.tab[data-tab="home"], #homeView, .obj-rail { display: none; }
+html.boutique .tab[data-tab="home"] { display: flex; }
+html.boutique #homeView:not([hidden]) { display: block; }
+
+/* ---------- palette: desert boutique ---------- */
+html.boutique {
+  --bg: #FFFBF5; --soft: #EFE6D8; --ink: #3E3631; --ink2: #6B5E52; --line: #E6D9C4;
+  --ok: #4F5E39; --bad: #8E4527; --field: #DCCDB5; --cream: #FBF6EE;
+  --green: #5E4433; --gold: #B9643F; --gold-l: #E8B48F; --terra: #A9573A; --rail: 112px;
+}
+html.boutique body { background: #EFE6D8 url(/admin/ui/linen.webp) repeat; background-size: 512px 512px; color: var(--ink); }
+html.boutique :focus-visible { outline: 3px solid var(--terra); outline-offset: 2px; }
+html.boutique .view-head h1, html.boutique legend { color: var(--ink); }
+html.boutique .mark, html.boutique .rail-mark { color: var(--terra); }
+
+/* ---------- acrylic panels ---------- */
+html.boutique :is(fieldset, details, .switches, .login-box, .row, .empty, .inbox-card, .dm-table, .st-cost, .cc-cost, .sg-analysis, .sg-tags) {
+  background: linear-gradient(180deg, rgba(255,252,247,.78), rgba(250,243,233,.64));
+  border: 1px solid rgba(255,255,255,.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(140,110,80,.12), 0 14px 30px -22px rgba(62,46,34,.5), 0 1px 4px rgba(62,46,34,.07);
+}
+html.boutique :is(fieldset, .login-box, .switches) { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+html.boutique :is(fieldset, details, .switches, .row, .inbox-card) { border-radius: 18px; }
+html.boutique details details, html.boutique fieldset details { box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 3px rgba(62,46,34,.06); }
+html.boutique .dm-table th { background: rgba(239,230,216,.85); color: var(--ink); }
+html.boutique .dm-table tbody tr:hover, html.boutique .dm-table tbody tr:focus-visible { background: rgba(255,255,255,.6); }
+@media (max-width: 700px) { html.boutique .dm-table { background: none; border: 0; box-shadow: none; } html.boutique .dm-table tbody tr { background: rgba(255,251,245,.78); border-color: rgba(255,255,255,.8); } }
+html.boutique .login { background: transparent; }
+
+/* ---------- inputs, chips, switches ---------- */
+html.boutique :is(input, select, textarea) { background: rgba(255,255,255,.84); border-color: var(--field); border-radius: 12px; }
+html.boutique :is(input, select, textarea):focus { border-color: var(--terra); box-shadow: 0 0 0 3px rgba(169,87,58,.14); }
+html.boutique .chip { background: rgba(255,252,247,.8); border-color: rgba(110,90,70,.18); color: var(--ink); box-shadow: inset 0 1px 0 #fff; }
+html.boutique .chip.on { background: #B9643F; border-color: #A9573A; color: #FFF6EE; box-shadow: inset 0 1px 0 rgba(255,255,255,.25); }
+html.boutique .switch input:checked + span { background: var(--terra); }
+html.boutique .tag.ok { color: var(--ok); border-color: #CBD3B8; background: #EEF1E4; }
+html.boutique #toast { background: #5E4433; color: var(--cream); }
+
+/* ---------- soap-bar buttons (rendered in Blender, stretch to any width) ---------- */
+html.boutique .btn {
+  border-style: solid; border-width: 0; border-radius: 0;
+  border-image: url(/admin/ui/btn-cream.webp) 0 108 fill / 0 42px stretch;
+  background: none; min-height: 48px; padding: 6px 26px 12px;
+  color: #5E4B3C; font-weight: 700; text-shadow: 0 1px 0 rgba(255,255,255,.55), 0 -1px 0 rgba(94,75,60,.12);
+  transition: transform .12s ease, filter .12s ease;
+}
+html.boutique a.btn { color: #5E4B3C; }
+html.boutique .btn.solid { border-image-source: url(/admin/ui/btn-terracotta.webp); color: #FFF4EA; text-shadow: 0 -1px 0 rgba(90,40,20,.35), 0 1px 0 rgba(255,255,255,.18); }
+html.boutique .btn:hover { filter: brightness(1.05) saturate(1.05); }
+html.boutique .btn:active { transform: translateY(2px) scale(.985); filter: brightness(.95); }
+html.boutique .btn.danger { border-image: none; border: 1.5px solid var(--bad); border-radius: 999px; color: var(--bad); background: rgba(255,251,245,.6); text-shadow: none; padding: 8px 18px; }
+html.boutique .sticky-save { box-shadow: none; filter: drop-shadow(0 8px 14px rgba(62,46,34,.25)); }
+html.boutique .inbox-card .acts button.main { background: #B9643F; border-color: #A9573A; color: #FFF6EE; }
+
+/* ---------- frames: top bar, sheets ---------- */
+html.boutique .top, html.boutique .sheet-head { background: rgba(251,246,238,.82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom-color: rgba(110,90,70,.15); }
+html.boutique dialog.sheet { background: #EFE6D8 url(/admin/ui/linen.webp) repeat; background-size: 512px 512px; }
+html.boutique dialog.sheet::backdrop { background: rgba(62,46,34,.35); }
+
+/* object shown next to the screen title after arriving from an object */
+.vh-obj { width: 64px; height: 64px; flex: none; margin-inline-end: -4px; animation: vhLand .5s cubic-bezier(.2,.8,.2,1) both; }
+html.boutique .view-head:has(.vh-obj) { justify-content: flex-start; }
+html.boutique .view-head:has(.vh-obj) .btn { margin-inline-start: auto; }
+@keyframes vhLand { from { transform: translateY(40px) scale(1.6); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- phone bottom bar ---------- */
+html.boutique .tabs { background: rgba(251,246,238,.9); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-top-color: rgba(110,90,70,.15); }
+html.boutique .tab.on { color: var(--terra); }
+html.boutique .tab.on::before { background: var(--terra); }
+@media (max-width: 1023px) { html.boutique .tab[data-tab="calc"] { display: none; } }
+
+/* ---------- desktop rail: the same objects as the home screen ---------- */
+@media (min-width: 1024px) {
+  html.boutique .tabs { background: rgba(255,250,242,.6); border-inline-start: 1px solid rgba(110,90,70,.15); border-top: 0; padding: 12px 6px; gap: 2px; }
+  html.boutique .rail-top { cursor: pointer; color: var(--ink); border-bottom-color: rgba(110,90,70,.15); padding-bottom: 8px; }
+  html.boutique .rail-top:hover .rail-mark { transform: scale(1.06); }
+  html.boutique .rail-mark { transition: transform .15s ease; }
+  html.boutique .tab:is([data-tab="home"], [data-tab="products"], [data-tab="workshops"], [data-tab="calc"], [data-tab="data"]) { display: none; }
+  html.boutique .obj-rail { display: flex; flex-direction: column; gap: 0; padding: 4px 0 8px; border-bottom: 1px solid rgba(110,90,70,.15); margin-bottom: 4px; }
+  html.boutique .tab, html.boutique .rail-link { color: var(--ink); min-height: 0; flex-direction: row; justify-content: center; gap: 6px; padding: 5px 4px; font-size: 12px; }
+  html.boutique .rail-top { padding: 0 0 6px; } html.boutique .rail-mark { font-size: 28px; }
+  html.boutique .tab .ico, html.boutique .rail-link .ico { width: 20px; height: 20px; }
+  html.boutique .tab:hover, html.boutique .rail-link:hover { background: rgba(255,255,255,.55); }
+  html.boutique .tab.on { color: var(--terra); background: rgba(201,154,75,.16); border-color: transparent; box-shadow: none; }
+  html.boutique .rail-bottom { border-top-color: rgba(110,90,70,.15); }
+  html.boutique .dot { top: 2px; left: auto; right: 6px; }
+}
+.orb { background: none; border: 0; padding: 1px 0 2px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; color: var(--ink); font-family: inherit; font-weight: 600; font-size: 12px; line-height: 1.2; flex-shrink: 0; }
+.orb img { width: 40px; height: 40px; transition: transform .15s ease; }
+.orb:hover img { transform: translateY(-2px) scale(1.07); }
+.orb:active img { transform: scale(.94); }
+.orb.on { background: rgba(201,154,75,.18); color: var(--terra); }
+
+/* ---------- home screen: floating objects ---------- */
+.home-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 4px 0 6px; }
+.home-head h1 { margin: 0; font-family: "Frank Ruhl Libre", serif; font-weight: 500; font-size: 34px; color: var(--ink); }
+.home-head p { margin: 0; color: var(--ink2); font-size: 15px; }
+.home-sec { margin-top: 10px; }
+.home-h { display: flex; align-items: center; gap: 14px; margin: 0 0 2px; font-family: "Frank Ruhl Libre", serif; font-size: 21px; font-weight: 500; color: var(--ink2); }
+.home-h::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to left, rgba(107,94,82,.35), rgba(107,94,82,0)); }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 18px; }
+.hobj { position: relative; background: none; border: 0; padding: 6px 0 4px; display: flex; flex-direction: column; align-items: center; color: var(--ink); border-radius: 18px; transition: opacity .25s ease; font-family: inherit; }
+.stage { position: relative; display: block; width: min(150px, 100%); aspect-ratio: 1; }
+.halo { position: absolute; left: 50%; top: 79%; width: 109%; height: 39%; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(255,249,238,.95), rgba(255,249,238,.55) 45%, rgba(255,249,238,0)); }
+.shadow { position: absolute; left: 50%; top: 91%; width: 69%; height: 12%; border-radius: 50%; background: radial-gradient(closest-side, rgba(62,46,34,.55), rgba(62,46,34,0)); transform: translateX(-50%); animation: hShadow 4.2s ease-in-out infinite; }
+.lift { position: absolute; inset: 0; transition: transform .22s cubic-bezier(.2,.9,.3,1.2); }
+.obj { display: block; width: 100%; height: 100%; animation: hFloat 4.2s ease-in-out infinite; }
+.hname { margin-top: 2px; font-size: 18px; font-weight: 700; color: var(--ink); }
+.hsub { font-size: 13.5px; font-weight: 600; color: #8A5A3E; opacity: 0; transform: translateY(-4px); transition: opacity .2s ease, transform .2s ease; }
+.hobj:hover .lift { transform: translateY(-10px) scale(1.06) rotate(-2deg); }
+.hobj:hover .hsub, .hobj:focus-visible .hsub { opacity: 1; transform: none; }
+.hobj:active .lift { transform: scale(.93); transition-duration: .08s; }
+.hobj.launch .lift { transform: translateY(-24px) scale(1.4); transition: transform .28s cubic-bezier(.3,1.4,.5,1); }
+body.launching .hobj:not(.launch) { opacity: .35; }
+@keyframes hFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7%); } }
+@keyframes hShadow { 0%, 100% { transform: translateX(-50%) scaleX(1); opacity: .5; } 50% { transform: translateX(-50%) scaleX(.76); opacity: .28; } }
+@media (hover: none) { .hsub { display: none; } }
+@media (max-width: 520px) {
+  .home-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 8px; }
+  .home-head h1 { font-size: 27px; }
+  .hname { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .obj, .shadow, .vh-obj { animation: none; } .lift { transition: none; } }

@@ -10,6 +10,8 @@
   <link rel="manifest" href="/admin/manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/admin/admin.css?v=20261012e">
+  <link rel="stylesheet" href="/admin/ui.css?v=20261017a">
+  <script>try{if((localStorage.getItem("rs_admin_look")||"boutique")==="boutique")document.documentElement.classList.add("boutique")}catch(e){document.documentElement.classList.add("boutique")}</script>
 </head>
 <body>
   <!-- ============ LOGIN ============ -->
@@ -38,6 +40,12 @@
     </header>
 
     <main class="views">
+      <!-- home (boutique look): floating objects, built by ui.js -->
+      <section class="view" data-view="home" id="homeView" hidden>
+        <div class="home-head"><h1 id="homeHello">שלום, רבקה</h1><p>מה יוצרים היום?</p></div>
+        <div id="homeSections"></div>
+      </section>
+
       <!-- products -->
       <section class="view" data-view="products">
         <div class="view-head">
@@ -156,6 +164,10 @@
               <button class="btn" type="button" data-copy="/feed.csv">קישור פיד מוצרים (פייסבוק/אינסטגרם)</button>
             </div>
           </fieldset>
+          <fieldset><legend>מראה מסכי הניהול (במכשיר הזה)</legend>
+            <label class="radio"><input type="radio" name="adminLook" value="boutique"> בוטיק: אובייקטים תלת־ממדיים, פשתן וכפתורי סבון</label>
+            <label class="radio"><input type="radio" name="adminLook" value="classic"> קלאסי: ירוק וזהב</label>
+          </fieldset>
           <fieldset><legend>שינוי סיסמה</legend>
             <form id="pwForm" class="inline-form">
               <input type="password" name="pw" minlength="8" autocomplete="new-password" placeholder="סיסמה חדשה (8 תווים לפחות)" required>
@@ -168,6 +180,8 @@
 
     <nav class="tabs" aria-label="ניווט ניהול">
       <div class="rail-top"><span class="rail-mark">R</span><small>ניהול</small></div>
+      <div class="obj-rail" id="objRail" aria-label="מדורים"></div>
+      <button class="tab" data-tab="home" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7 M6 9.5V20h12V9.5 M10 20v-5h4v5"/></svg><span>בית</span></button>
       <button class="tab on" data-tab="products" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5C4 7.6 5.6 6 7.5 6h9C18.4 6 20 7.6 20 9.5v5c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 18 4 16.4 4 14.5z M8.5 10.5h7"/></svg><span>מוצרים</span></button>
       <button class="tab" data-tab="workshops" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v14H4z M4 10h16 M8 3v4 M16 3v4 M8 14h3 M13 14h3"/></svg><span>סדנאות</span></button>
       <button class="tab" data-tab="inbox" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z M4 16l5-5 4 4 3-3 4 4 M15.5 9h.01"/></svg><span>תמונות</span> <b class="dot" id="newInbox" hidden></b></button>
@@ -397,11 +411,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/js/config.js?v=20261011d"></script>
-  <script src="/admin/studio.js?v=20261012e"></script>
-  <script src="/admin/suggest.js?v=20261012e"></script>
-  <script src="/admin/soapcalc.js?v=20261012e"></script>
-  <script src="/admin/calcui.js?v=20261012e"></script>
-  <script src="/admin/data.js?v=20261012e"></script>
-  <script src="/admin/admin.js?v=20261012e"></script>
+  <script src="/admin/studio.js?v=20261017a"></script>
+  <script src="/admin/suggest.js?v=20261017a"></script>
+  <script src="/admin/soapcalc.js?v=20261017a"></script>
+  <script src="/admin/calcui.js?v=20261017a"></script>
+  <script src="/admin/data.js?v=20261017a"></script>
+  <script src="/admin/admin.js?v=20261017a"></script>
+  <script src="/admin/ui.js?v=20261017a"></script>
 </body>
 </html>
