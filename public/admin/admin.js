@@ -248,7 +248,7 @@
   let FORMS = null;
   $("#printForms").onclick = () => {
     if (!window.RSForms) return toast("רכיב הטפסים לא נטען — רענני את הדף");
-    if (!FORMS) FORMS = window.RSForms(sb, { getProducts: () => S.products || [], toast, abs, tags: (ST && ST.TAGS) || {} });
+    if (!FORMS) FORMS = window.RSForms(sb, { getProducts: () => S.products || [], getInbox: () => S.inbox || [], toast, abs, tags: (ST && ST.TAGS) || {} });
     FORMS.open();
   };
   $("#prodDelete").onclick = async () => {
