@@ -55,6 +55,8 @@ test("each form carries its photo, a matching code, and what is already known", 
   assert.ok(html.includes("RC-012 · תשרית רובארב"));
   assert.ok(html.includes('class="ck on">נשים'));
   assert.ok(html.includes("אין תמונה"));
+  // שם קיים: מוצג כ"שם נוכחי", והשורה לכתיבה היא "שם חדש" — רק אם רוצים לשנות
+  assert.ok(html.includes("שם נוכחי:") && html.includes("שם חדש (רק אם רוצים לשנות)"));
 });
 
 test("names are escaped and the legend lists every recipe and mold code", () => {
