@@ -20,11 +20,11 @@
     `<div class="box${wide ? " wide" : ""}"><span class="lbl">${esc(label)}</span><span class="val">${value ? esc(value) : ""}</span></div>`;
 
   /** The fields Rebecca writes in — the same on every form. */
-  function fieldsHtml(p, d, ctx) {
+  function fieldsHtml(p, d, ctx, nameLabel = "שם המוצר") {
     const tags = d.tags || {};
     const tagRows = Object.entries(ctx.tags).map(([g, vals]) => `<div class="tg"><b>${esc(g)}:</b> ${vals.map(v =>
       `<span class="ck${(tags[g] || []).includes(v) ? " on" : ""}">${esc(v)}</span>`).join("")}</div>`).join("");
-    return `<div class="field"><span class="lbl">שם המוצר</span>${lines(1)}</div>
+    return `<div class="field"><span class="lbl">${esc(nameLabel)}</span>${lines(1)}</div>
 <div class="grid">
   ${box("מתכון — קוד מהמקרא", d.recipe_id || "")}
   ${box("תבנית — קוד מהמקרא", d.mold_tool_id || "")}
@@ -48,13 +48,14 @@
 <div class="top">
   ${img ? `<img src="${esc(img)}" alt="">` : `<div class="noimg">אין תמונה</div>`}
   <div class="known">
+    <div class="muted small">שם נוכחי:</div>
     <h2>${esc(p.name_he || "מוצר בלי שם")}</h2>
     <div class="muted">${esc(CAT[p.category] || "")}${p.published ? " · מוצג באתר" : " · עוד לא באתר"}${d.sku ? ` · <span dir="ltr">${esc(d.sku)}</span>` : ""}</div>
     <div class="have">${[p.price != null ? `מחיר: ₪${num(p.price)}` : "", d.unit_weight_g ? `משקל: ${num(d.unit_weight_g)} גרם` : "", recipe ? `מתכון: ${recipe}` : ""]
       .filter(Boolean).map(esc).join("<br>") || "עוד אין פרטים — הכל ממלאים כאן"}</div>
   </div>
 </div>
-${fieldsHtml(p, d, ctx)}
+${fieldsHtml(p, d, ctx, p.name_he ? "שם חדש (רק אם רוצים לשנות)" : "שם המוצר")}
 </section>`;
   }
 
@@ -114,7 +115,7 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 .known{display:flex;flex-direction:column;gap:2mm}
 h2{font-family:"Frank Ruhl Libre",serif;font-weight:500;color:#163B30;margin:0;font-size:22px;text-align:center}
 .known h2{text-align:right}
-.muted{color:#5E675F}.center{text-align:center}
+.muted{color:#5E675F}.center{text-align:center}.small{font-size:12px}
 .have{background:#F3EDE1;border-radius:3mm;padding:3mm;line-height:1.6}
 .lbl{color:#163B30;font-weight:700;font-size:13px}
 .field{display:flex;flex-direction:column;gap:1mm}
