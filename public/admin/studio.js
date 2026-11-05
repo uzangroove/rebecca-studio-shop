@@ -260,5 +260,5 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
   const getExtra = () => st.extra;
   const ready = () => D.loaded;
 
-  return { load, open, save, skuOf, context, visibleMaterials, addMaterials, setExtra, getExtra, ready };
+  return { load, open, save, skuOf, context, visibleMaterials, addMaterials, setExtra, getExtra, ready, TAGS };
 };

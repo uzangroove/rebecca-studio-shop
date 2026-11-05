@@ -31,6 +31,12 @@ so imported recipes are stored with `lye_purity = 1`. Qualities use the SoapCalc
 Storage bucket `media` (public read, admin write). All writes are protected by RLS via `public.is_admin()`.
 To add an admin: create the user in Supabase Auth, then `insert into admins(email) values ('…');`
 
+## Product weight and fill-in forms
+
+- **Weight on the product card.** The site shows the unit weight from "פרטי ייצור" (`product_details.unit_weight_g`) as a line under the description ("משקל: 100 גרם"), not next to the price. `product_details` stays admin-only; the site reads only the weight of published products through the `product_weights()` function (`supabase/product_weights.sql`). A price note that holds only a number ("100") is treated as a weight, and the admin moves it to the weight field on save.
+- **טפסי מילוי.** Products → "טפסי מילוי" prints one A4 page per product: the photo, what is already known, and lines for Rebecca to write the name, recipe code, mold code, weight, price, scent, colors, her own words and the tags. A legend page lists the recipe and mold codes. Each form has a code (`F-XXXXXX`) that matches it to its product when the filled page is photographed. Code: `public/admin/forms.js` (pure `formsHtml()`, tested).
+- Tests: `node --test tests/*.test.mjs`.
+
 ## Deploy
 Netlify site `rebecca-studio`, linked to this repo (branch `main`, publish dir `public`).
 Env vars on Netlify: `SUPABASE_URL`, `SUPABASE_ANON_KEY` (public anon key).

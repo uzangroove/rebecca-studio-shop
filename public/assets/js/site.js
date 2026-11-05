@@ -136,9 +136,12 @@
     const name = pick(p, "name");
     $("#pdCat").textContent = catLabel(p.category);
     $("#pdName").textContent = name;
-    const note = pick(p, "price_note");
+    const note = window.RSFacts ? RSFacts.priceNote(p, RS.lang) : pick(p, "price_note");
     $("#pdPrice").textContent = p.price != null ? `${price(p.price)}${note ? " · " + note : ""}` : t("price_ask");
     $("#pdDesc").textContent = pick(p, "desc") || pick(p, "short");
+    const facts = window.RSFacts ? RSFacts.facts(p, RS.lang) : [];
+    const dl = $("#pdFacts"); dl.hidden = !facts.length;
+    dl.innerHTML = facts.map(f => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join("");
     const imgs = (p.images && p.images.length) ? p.images : [imgOf(p)];
     const main = $("#pdImg"); main.src = imgs[0]; main.alt = name;
     $("#pdThumbs").innerHTML = imgs.length > 1 ? imgs.map((src, i) =>
@@ -292,7 +295,9 @@
     $("#year").textContent = new Date().getFullYear();
     renderAll();
     try {
-      const [products, workshops, settings] = await Promise.all([api.products(), api.workshops(), api.settings(), loadSeats()]);
+      const [products, workshops, settings, weights] = await Promise.all([api.products(), api.workshops(), api.settings(), api.weights(), loadSeats()]);
+      const w = new Map((weights || []).map(r => [r.product_id, r.unit_weight_g]));
+      products.forEach(p => { if (w.has(p.id)) p.weight_g = Number(w.get(p.id)); });
       state.products = products; state.workshops = workshops; state.settings = settings;
       cache.set("products", products); cache.set("workshops", workshops); cache.set("settings", settings);
       renderAll();

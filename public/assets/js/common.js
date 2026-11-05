@@ -26,6 +26,8 @@
     products: () => rest("products?select=*&published=eq.true&order=category.asc,sort_order.asc,created_at.asc"),
     workshops: () => rest("workshops?select=*&published=eq.true&order=starts_at.asc.nullslast,sort_order.asc"),
     seats: () => rest("rpc/workshop_seats_taken", { method: "GET" }).catch(() => []),
+    // משקל היחידה של מוצרים שמוצגים באתר (מתוך פרטי הייצור). אם הפונקציה לא זמינה — בלי משקל.
+    weights: () => rest("rpc/product_weights", { method: "GET" }).catch(() => []),
     settings: () => rest("settings?select=data&id=eq.1").then(r => (r && r[0] && r[0].data) || {}),
     signup: (row) => rest("workshop_signups", { method: "POST", body: row, headers: { Prefer: "return=minimal" } })
   };

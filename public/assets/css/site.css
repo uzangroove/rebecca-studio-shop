@@ -170,6 +170,11 @@ html[lang="he"] .pd-cat { letter-spacing: .05em; font-family: var(--f-he); font-
 html[lang="en"] .pd-info h2 { font-family: var(--f-display); }
 .pd-price { margin: 0; font-size: 22px; font-family: var(--f-latin); }
 .pd-desc { color: var(--ink-2); white-space: pre-line; }
+.pd-facts { margin: 2px 0 0; padding-top: 10px; border-top: 1px solid var(--line); display: grid; gap: 4px; font-size: 15px; }
+.pd-facts div { display: flex; gap: 8px; }
+.pd-facts dt { color: var(--ink-2); }
+.pd-facts dt::after { content: ":"; }
+.pd-facts dd { margin: 0; }
 .pd-actions { display: flex; gap: 12px; align-items: stretch; margin-top: 8px; }
 .pd-actions .btn { flex: 1; padding: 12px; font-size: 16px; }
 .qty { display: flex; align-items: center; border: 1.5px solid var(--ink); }
