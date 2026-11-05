@@ -9,7 +9,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="manifest" href="/admin/manifest.webmanifest">
   <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Frank+Ruhl+Libre:wght@400;500&family=Montserrat:wght@400;600&family=Playfair+Display:wght@400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/admin/admin.css?v=20261012e">
+  <link rel="stylesheet" href="/admin/admin.css?v=20261105a">
   <link rel="stylesheet" href="/admin/ui.css?v=20261017a">
   <script>try{if((localStorage.getItem("rs_admin_look")||"boutique")==="boutique")document.documentElement.classList.add("boutique")}catch(e){document.documentElement.classList.add("boutique")}</script>
 </head>
@@ -50,7 +50,10 @@
       <section class="view" data-view="products">
         <div class="view-head">
           <h1>מוצרים</h1>
-          <button class="btn solid" type="button" id="newProduct">+ מוצר חדש</button>
+          <div class="head-acts">
+            <button class="btn" type="button" id="printForms">טפסי מילוי</button>
+            <button class="btn solid" type="button" id="newProduct">+ מוצר חדש</button>
+          </div>
         </div>
         <p class="todo" id="todo" hidden></p>
         <div class="toolbar">
@@ -411,12 +414,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/js/config.js?v=20261011d"></script>
-  <script src="/admin/studio.js?v=20261017a"></script>
+  <script src="/assets/js/product-facts.js?v=20261105a"></script>
+  <script src="/admin/studio.js?v=20261105a"></script>
+  <script src="/admin/forms.js?v=20261105a"></script>
   <script src="/admin/suggest.js?v=20261017a"></script>
   <script src="/admin/soapcalc.js?v=20261017a"></script>
   <script src="/admin/calcui.js?v=20261017a"></script>
   <script src="/admin/data.js?v=20261017a"></script>
-  <script src="/admin/admin.js?v=20261017a"></script>
+  <script src="/admin/admin.js?v=20261105a"></script>
   <script src="/admin/ui.js?v=20261017a"></script>
 </body>
 </html>

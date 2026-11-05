@@ -318,3 +318,31 @@ legend { color: var(--green); }
 .dm-fa label { font-size: 13px; }
 .dm-fa input { padding: 7px 8px; }
 @media (max-width: 760px) { .cc-big { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cc-big .cc-total { grid-column: 1 / -1; } .cc-qs { grid-template-columns: 1fr; } .dm-fa { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* printable fill-in forms (forms.js) */
+.forms-list { display: flex; flex-direction: column; gap: 6px; }
+#formsDlg label.forms-item { display: grid; grid-template-columns: 28px 52px 1fr; align-items: center; gap: 10px; min-height: 56px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); cursor: pointer; }
+.forms-item input { width: 22px; height: 22px; accent-color: var(--green, #163B30); }
+.forms-item img, .forms-item .noimg { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--soft); }
+.forms-item small { display: block; color: var(--ink-2, #5E675F); font-size: 12px; }
+#formsDlg label.forms-legend { flex-direction: row; align-items: center; gap: 10px; min-height: 44px; color: var(--ink); }
+.forms-legend input { width: 22px; height: 22px; accent-color: var(--green, #163B30); }
+.head-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.forms-tabs .chip.on { background: var(--green, #163B30); color: #fff; border-color: var(--green, #163B30); }
+.forms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.forms-pic { position: relative; display: block; aspect-ratio: 1; border-radius: 12px; overflow: hidden; cursor: pointer; background: var(--soft); }
+.forms-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.forms-pic input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.forms-pic .tick { position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,.92); border: 2px solid var(--green, #163B30); }
+.forms-pic:has(input:checked) { outline: 3px solid var(--green, #163B30); outline-offset: -3px; }
+.forms-pic:has(input:checked) .tick { background: var(--green, #163B30); }
+.forms-pic:has(input:checked) .tick::after { content: "✓"; color: #fff; display: grid; place-items: center; height: 100%; font-weight: 700; }
+.forms-pic:has(input:focus-visible) { outline: 3px solid var(--gold, #8A6A2F); }
+.forms-act { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0; background: var(--soft); border-top: 1px solid var(--line); }
+.forms-act span { flex: 1 1 100%; font-size: 14px; }
+.forms-act .btn { min-height: 44px; }
+.forms-groups { display: flex; flex-direction: column; gap: 6px; }
+.forms-groups:empty { display: none; }
+.forms-group { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.forms-group img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+.forms-group span { flex: 1; font-size: 14px; }

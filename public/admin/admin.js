@@ -211,6 +211,14 @@
     e.preventDefault();
     const f = e.target, btn = f.querySelector("button[type=submit]");
     const val = k => { const x = f[k].value.trim(); return x === "" ? null : x; };
+    // "100" בהערת המחיר הוא בעצם משקל: מעבירים אותו לשדה "משקל יחידה" שבפרטי הייצור.
+    const noteW = window.RSFacts && RSFacts.weightFromNote(f.price_note_he.value);
+    const wIn = $("#stWeight");
+    if (noteW && wIn) {
+      if (!wIn.value.trim()) { wIn.value = noteW; wIn.dispatchEvent(new Event("input", { bubbles: true })); }
+      f.price_note_he.value = "";
+      toast(`המשקל (${noteW} גרם) עבר לשדה "משקל יחידה"`);
+    }
     const row = {
       category: f.category.value, name_he: val("name_he"), name_en: val("name_en"),
       short_he: val("short_he"), short_en: val("short_en"), desc_he: val("desc_he"), desc_en: val("desc_en"),
@@ -237,6 +245,12 @@
     $("#prodDlg").close(); toast(row.published ? "נשמר ✓" : "נשמר ✓ (מוסתר באתר עד שתסמני \"מוצג באתר\")"); loadProducts(); loadInbox();
   };
   $("#newProduct").onclick = () => openProduct(null);
+  let FORMS = null;
+  $("#printForms").onclick = () => {
+    if (!window.RSForms) return toast("רכיב הטפסים לא נטען — רענני את הדף");
+    if (!FORMS) FORMS = window.RSForms(sb, { getProducts: () => S.products || [], getInbox: () => S.inbox || [], toast, abs, tags: (ST && ST.TAGS) || {} });
+    FORMS.open();
+  };
   $("#prodDelete").onclick = async () => {
     const p = S.editing; if (!p) return;
     if (!confirm(`למחוק לצמיתות את "${p.name_he}"? (אפשר גם רק להסתיר אותו)`)) return;
