@@ -170,7 +170,7 @@
     $("#uploadMsg").textContent = "";
     renderEditImgs();
     if (SG) SG.reset();
-    if (ST) ST.open(p, v.category).then(() => { if (SG) SG.loaded(); }).catch(e => console.warn("studio open", e));
+    if (ST) ST.open(p, v.category).then(() => { fillTechnique(S.pendingInbox); if (SG) SG.loaded(); }).catch(e => console.warn("studio open", e));
     $("#prodDlg").showModal();
   }
   function renderEditImgs() {
@@ -244,6 +244,12 @@
     S.pendingInbox = [];
     $("#prodDlg").close(); toast(row.published ? "נשמר ✓" : "נשמר ✓ (מוסתר באתר עד שתסמני \"מוצג באתר\")"); loadProducts(); loadInbox();
   };
+  // הטכניקה שרבקה כתבה בסטודיו התמונות נכנסת לכרטיס המוצר — רק אם השדה עוד ריק.
+  function fillTechnique(inboxIds) {
+    const el = $("#stTechnique"); if (!el || el.value.trim() || !window.RSTechniquesOf) return;
+    const ids = new Set(inboxIds);
+    el.value = window.RSTechniquesOf(S.inbox.filter(m => ids.has(m.id))).slice(0, 200);
+  }
   $("#newProduct").onclick = () => openProduct(null);
   let FORMS = null;
   $("#printForms").onclick = () => {
@@ -273,7 +279,8 @@
   const STATUS_LBL = { new: "ממתינה", used: "במוצר", post: "לפוסט", discarded: "נדחתה" };
   function inboxMeta(m) {
     const d = new Date(m.created_at).toLocaleDateString("he-IL", { day: "numeric", month: "short", timeZone: "Asia/Jerusalem" });
-    return `${m.variant === "branded" ? "עם מיתוג" : "נקייה"} · ${d}`;
+    const t = m.meta && m.meta.technique ? ` · ${m.meta.technique}` : "";
+    return `${m.variant === "branded" ? "עם מיתוג" : "נקייה"} · ${d}${t}`;
   }
   function renderInbox() {
     const items = S.inbox.filter(m => S.inboxFilter === "all" || m.status === "new");
@@ -327,6 +334,15 @@
       <div><h3>${esc(p.name_he)}</h3><div class="sub">${esc(CAT[p.category])} · ${(p.images || []).length} תמונות</div></div></div>`).join("") || `<div class="empty">לא נמצא מוצר</div>`;
   }
   $("#assignSearch").oninput = renderAssign;
+  async function keepTechnique(pid, m) {
+    const t = window.RSTechniquesOf ? window.RSTechniquesOf([m]).slice(0, 200) : "";
+    if (!t) return;
+    const { data, error } = await sb.from("product_details").select("technique").eq("product_id", pid).maybeSingle();
+    if (error) return console.warn(error);
+    if (data && data.technique) return; // כבר כתוב — לא דורסים
+    const q = data ? sb.from("product_details").update({ technique: t }).eq("product_id", pid) : sb.from("product_details").insert({ product_id: pid, technique: t });
+    const { error: e2 } = await q; if (e2) console.warn(e2);
+  }
   async function doAssign(pid) {
     const p = S.products.find(x => x.id === pid); if (!p || !assignItem) return;
     const asMain = document.querySelector('input[name="assignPos"]:checked').value === "main";
@@ -335,6 +351,7 @@
     const { error } = await sb.from("products").update({ images: next }).eq("id", p.id);
     if (error) return fail(error);
     await sb.from("media_inbox").update({ status: "used", product_id: p.id }).eq("id", assignItem.id);
+    await keepTechnique(p.id, assignItem);
     $("#assignDlg").close(); toast(`התמונה נוספה ל"${p.name_he}" ✓`); loadProducts(); loadInbox();
   }
   $("#assignList").addEventListener("click", e => { const r = e.target.closest("[data-pid]"); if (r) doAssign(r.dataset.pid); });
@@ -362,6 +379,7 @@
   $("#pickGrid").addEventListener("keydown", e => { const c = e.target.closest("[data-pick]"); if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); togglePick(c); } });
   $("#pickDone").onclick = () => {
     for (const id of picked) { const m = S.inbox.find(x => x.id === id); if (m && !S.editImgs.includes(m.url)) { S.editImgs.push(m.url); S.pendingInbox.push(m.id); } }
+    fillTechnique(picked);
     renderEditImgs(); $("#pickDlg").close();
     if (picked.size) $("#uploadMsg").textContent = "התמונות נוספו ✓ (נשמרות במוצר אחרי לחיצה על שמירה)";
   };

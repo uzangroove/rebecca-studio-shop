@@ -47,7 +47,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
   /* ---------- open / render ---------- */
   async function open(p, category) {
     st.productId = p ? p.id : null; st.existing = null; st.mats = []; st.recipeMats = []; st.lead = null; st.leadAuto = true; st.tags = {}; st.touched = false; st.extra = {};
-    $("#stSearch").value = ""; $("#stWeight").value = ""; $("#stFree").value = ""; $("#stStatus").value = "טיוטה";
+    $("#stSearch").value = ""; $("#stWeight").value = ""; $("#stFree").value = ""; $("#stTechnique").value = ""; $("#stStatus").value = "טיוטה";
     $("#stRecipe").value = ""; $("#stMold").value = ""; $("#stCat").value = CAT_MAP[category] || "SP";
     $("#studioBox").open = false;
     if (!D.loaded) { $("#stBody").hidden = true; $("#stLoading").hidden = false; if (!(await load())) { $("#stLoading").textContent = "לא ניתן לטעון את מאגר החומרים כרגע."; return; } }
@@ -61,7 +61,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
         const v = d.data; st.existing = v;
         if (v.sku_cat) $("#stCat").value = v.sku_cat; else if (v.sku) $("#stCat").value = v.sku.slice(0, 2);
         $("#stRecipe").value = v.recipe_id || ""; $("#stMold").value = v.mold_tool_id || "";
-        $("#stWeight").value = v.unit_weight_g || ""; $("#stFree").value = v.free_text || ""; $("#stStatus").value = v.status || "טיוטה";
+        $("#stWeight").value = v.unit_weight_g || ""; $("#stFree").value = v.free_text || ""; $("#stTechnique").value = v.technique || ""; $("#stStatus").value = v.status || "טיוטה";
         st.tags = JSON.parse(JSON.stringify(v.tags || {})); st.lead = v.lead_material_id || null; st.leadAuto = !st.lead;
         const r = D.recipes[v.recipe_id]; st.recipeMats = r ? r.lines.map(x => x[0]) : [];
         st.extra = { name_short: v.name_short || null, seo_keywords: v.seo_keywords || [], hashtags: v.hashtags || [], meta_description: v.meta_description || null, photo_analysis: v.photo_analysis || null };
@@ -212,7 +212,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
     const row = {
       product_id: productId, sku: sku || null, sku_cat: cat || null, lead_material_id: st.lead || null,
       recipe_id: $("#stRecipe").value || null, mold_tool_id: $("#stMold").value || null,
-      ...st.extra, tags: st.tags, free_text: $("#stFree").value.trim() || null, status: $("#stStatus").value || "טיוטה",
+      ...st.extra, tags: st.tags, free_text: $("#stFree").value.trim() || null, technique: $("#stTechnique").value.trim() || null, status: $("#stStatus").value || "טיוטה",
       unit_weight_g: parseFloat(String($("#stWeight").value).replace(",", ".")) || null,
       cost_estimate: c ? { per_100g: Math.round(c.per100 * 100) / 100, per_unit: c.unit === null ? null : Math.round(c.unit * 100) / 100, missing: c.missing, at: new Date().toISOString().slice(0, 10) } : null
     };

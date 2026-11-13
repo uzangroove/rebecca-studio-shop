@@ -84,3 +84,17 @@ test("products and image groups print together, products first", () => {
   assert.ok(html.indexOf("F-AAAA11") < html.indexOf("N-DDDD11"));
   assert.ok(html.includes("<title>טפסי מילוי · 3 טפסים</title>"));
 });
+
+test("every form has a technique field; a known technique is printed on it", () => {
+  const { techniquesOf } = require("../public/admin/forms.js");
+  const blank = formsHtml({ ...ctx, legend: false });
+  assert.equal((blank.match(/טכניקה \/ עיצוב/g) || []).length, 2, "one per product page");
+  const withT = formsHtml({ ...ctx, details: { [products[0].id]: { technique: "שכבות <ושיש>" } }, legend: false });
+  assert.ok(withT.includes('<div class="ln pre">שכבות &lt;ושיש&gt;</div>'));
+  const imgs = [{ id: "e1", url: "u1", meta: { technique: "סווירל" } }, { id: "e2", url: "u2", meta: { technique: " סווירל " } }, { id: "e3", url: "u3", meta: { technique: "הטבעה" } }, { id: "e4", url: "u4", meta: {} }];
+  assert.equal(techniquesOf(imgs), "סווירל · הטבעה", "each technique once, empty ones skipped");
+  const g = formsHtml({ ...ctx, products: [], groups: [{ images: imgs }], legend: false });
+  assert.ok(g.includes('<div class="ln pre">סווירל · הטבעה</div>'));
+  const none = formsHtml({ ...ctx, products: [], groups: [{ images: [imgs[3]] }], legend: false });
+  assert.ok(none.includes("טכניקה / עיצוב") && !none.includes("ln pre"));
+});

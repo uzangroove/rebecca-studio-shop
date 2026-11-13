@@ -19,8 +19,22 @@
   const box = (label, value = "", wide = false) =>
     `<div class="box${wide ? " wide" : ""}"><span class="lbl">${esc(label)}</span><span class="val">${value ? esc(value) : ""}</span></div>`;
 
+  /** A field with writing lines; a value already known is printed on the first line, to keep or correct. */
+  const prefilled = (label, value, n) => `<div class="field"><span class="lbl">${esc(label)}</span>${value
+    ? `<div class="ln pre">${esc(value)}</div>${lines(n - 1)}` : lines(n)}</div>`;
+
+  /** Techniques typed in the photo studio for these images (meta.technique), each once. */
+  function techniquesOf(images) {
+    const seen = new Set(), out = [];
+    (images || []).forEach(m => {
+      const t = String((m.meta && m.meta.technique) || "").trim(), k = t.toLowerCase();
+      if (t && !seen.has(k)) { seen.add(k); out.push(t); }
+    });
+    return out.join(" · ");
+  }
+
   /** The fields Rebecca writes in — the same on every form. */
-  function fieldsHtml(p, d, ctx, nameLabel = "שם המוצר") {
+  function fieldsHtml(p, d, ctx, nameLabel = "שם המוצר", technique = "") {
     const tags = d.tags || {};
     const tagRows = Object.entries(ctx.tags).map(([g, vals]) => `<div class="tg"><b>${esc(g)}:</b> ${vals.map(v =>
       `<span class="ck${(tags[g] || []).includes(v) ? " on" : ""}">${esc(v)}</span>`).join("")}</div>`).join("");
@@ -33,6 +47,7 @@
 </div>
 <div class="field"><span class="lbl">ריח</span>${lines(1)}</div>
 <div class="field"><span class="lbl">צבעים ותוספות (צמחים, חימר, מיקה, שמנים מיוחדים…)</span>${lines(2)}</div>
+${prefilled("טכניקה / עיצוב", technique || d.technique || "", 2)}
 <div class="field"><span class="lbl">מה מיוחד בסבון הזה — במילים שלך, כמה מילים מספיקות</span>${lines(3)}</div>
 <div class="field"><span class="lbl">למי ולמה מתאים — סמני ✓</span><div class="tags">${tagRows}</div></div>
 <div class="foot"><span class="ck">מוכן לפרסום</span><span class="ck">עוד לא</span><span class="lbl">הערות:</span><span class="fill"></span></div>
@@ -74,7 +89,7 @@ ${fieldsHtml(p, d, ctx, p.name_he ? "שם חדש (רק אם רוצים לשנו�
     <div class="codes" dir="ltr">${codes.map(esc).join(" · ")}</div>
   </div>
 </div>
-${fieldsHtml({}, {}, ctx)}
+${fieldsHtml({}, {}, ctx, "שם המוצר", techniquesOf(g.images))}
 </section>`;
   }
 
@@ -100,7 +115,7 @@ ${molds.length ? `<h2>תבניות</h2>${cols(molds)}` : ""}
 body{font-family:Assistant,Arial,sans-serif;color:#1F2A24;margin:0;font-size:14px;background:#EDE8DE}
 .bar{position:sticky;top:0;display:flex;gap:10px;justify-content:center;align-items:center;padding:10px;background:#163B30;color:#FBF8F2}
 .bar button{font:inherit;font-size:16px;padding:10px 22px;border:0;border-radius:12px;background:#8A6A2F;color:#fff;cursor:pointer;min-height:44px}
-.page{background:#fff;width:210mm;min-height:297mm;margin:12px auto;padding:12mm;display:flex;flex-direction:column;gap:3.2mm;page-break-after:always;break-after:page}
+.page{background:#fff;width:210mm;min-height:297mm;margin:12px auto;padding:12mm;display:flex;flex-direction:column;gap:2.6mm;page-break-after:always;break-after:page}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #E7DFCF;padding-bottom:2mm}
 .brand{font-family:"Frank Ruhl Libre",serif;color:#163B30;font-size:15px}
 .code{font-size:20px;font-weight:700;letter-spacing:.06em;border:2px solid #163B30;border-radius:8px;padding:1mm 3mm}
@@ -119,9 +134,10 @@ h2{font-family:"Frank Ruhl Libre",serif;font-weight:500;color:#163B30;margin:0;f
 .have{background:#F3EDE1;border-radius:3mm;padding:3mm;line-height:1.6}
 .lbl{color:#163B30;font-weight:700;font-size:13px}
 .field{display:flex;flex-direction:column;gap:1mm}
-.ln{height:8.5mm;border-bottom:1px solid #9C9584}
+.ln{height:7mm;border-bottom:1px solid #9C9584}
+.ln.pre{display:flex;align-items:flex-end;padding-bottom:.8mm;font-size:15px;color:#8A6A2F}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:3mm}
-.box{border:1px solid #9C9584;border-radius:2.5mm;min-height:14mm;padding:1.5mm 2.5mm;display:flex;flex-direction:column}
+.box{border:1px solid #9C9584;border-radius:2.5mm;min-height:12.5mm;padding:1.5mm 2.5mm;display:flex;flex-direction:column}
 .box .val{font-size:16px;color:#8A6A2F;margin-top:auto}
 .tags{display:flex;flex-direction:column;gap:1.4mm;font-size:12.5px}
 .tg b{color:#163B30;margin-left:1mm}
@@ -267,7 +283,7 @@ ${pages.join("\n")}
       win.document.write(`<p dir="rtl" style="font-family:Arial;padding:24px">מכינים את הטפסים…</p>`); win.document.close();
       try {
         const [d, r, m] = await Promise.all([
-          ids.length ? sb.from("product_details").select("product_id,sku,recipe_id,mold_tool_id,unit_weight_g,tags").in("product_id", ids) : Promise.resolve({ data: [] }),
+          ids.length ? sb.from("product_details").select("product_id,sku,recipe_id,mold_tool_id,unit_weight_g,tags,technique").in("product_id", ids) : Promise.resolve({ data: [] }),
           sb.from("recipes").select("id,name").order("id"),
           sb.from("molds_tools").select("id,name").eq("kind", "תבנית").order("id")
         ]);
@@ -287,6 +303,6 @@ ${pages.join("\n")}
     return { open };
   }
 
-  const api = { formsHtml, formCode, imageCode, groupCode, RSForms };
-  if (typeof module !== "undefined" && module.exports) module.exports = api; else { root.RSForms = RSForms; root.RSFormsHtml = formsHtml; }
+  const api = { formsHtml, formCode, imageCode, groupCode, techniquesOf, RSForms };
+  if (typeof module !== "undefined" && module.exports) module.exports = api; else { root.RSForms = RSForms; root.RSFormsHtml = formsHtml; root.RSTechniquesOf = techniquesOf; }
 })(typeof window !== "undefined" ? window : globalThis);
