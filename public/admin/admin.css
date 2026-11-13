@@ -325,6 +325,8 @@ legend { color: var(--green); }
 .forms-item input { width: 22px; height: 22px; accent-color: var(--green, #163B30); }
 .forms-item img, .forms-item .noimg { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; background: var(--soft); }
 .forms-item small { display: block; color: var(--ink-2, #5E675F); font-size: 12px; }
+#formsDlg .forms-desc { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-top: 1px solid var(--line, #E7DFCF); }
+#formsDlg .forms-desc .btn { align-self: flex-start; min-height: 44px; }
 #formsDlg label.forms-legend { flex-direction: row; align-items: center; gap: 10px; min-height: 44px; color: var(--ink); }
 .forms-legend input { width: 22px; height: 22px; accent-color: var(--green, #163B30); }
 .head-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }

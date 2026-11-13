@@ -33,8 +33,21 @@
     return out.join(" · ");
   }
 
+  /** The first description suggestion saved on one of the group's images. */
+  function suggestionOf(images) {
+    const m = (images || []).find(x => x.meta && x.meta.desc_suggestion);
+    return m ? String(m.meta.desc_suggestion).trim() : "";
+  }
+
   /** The fields Rebecca writes in — the same on every form. */
-  function fieldsHtml(p, d, ctx, nameLabel = "שם המוצר", technique = "") {
+  /** "תיאור": the current site description, or the suggestion from the photo analysis, printed small (up to 3 lines). */
+  function descHtml(desc) {
+    if (!desc || !desc.text) return `<div class="field"><span class="lbl">תיאור — במילים שלך, כמה מילים מספיקות</span>${lines(3)}</div>`;
+    const note = desc.current ? "התיאור שבאתר — אפשר לתקן או לכתוב אחר" : "הצעה — אפשר למחוק, לתקן או לכתוב משלך";
+    return `<div class="field"><span class="lbl">תיאור <small class="note">${esc(note)}</small></span><div class="sugg">${esc(desc.text)}</div>${lines(1)}</div>`;
+  }
+
+  function fieldsHtml(p, d, ctx, nameLabel = "שם המוצר", technique = "", desc = null) {
     const tags = d.tags || {};
     const tagRows = Object.entries(ctx.tags).map(([g, vals]) => `<div class="tg"><b>${esc(g)}:</b> ${vals.map(v =>
       `<span class="ck${(tags[g] || []).includes(v) ? " on" : ""}">${esc(v)}</span>`).join("")}</div>`).join("");
@@ -48,7 +61,7 @@
 <div class="field"><span class="lbl">ריח</span>${lines(1)}</div>
 <div class="field"><span class="lbl">צבעים ותוספות (צמחים, חימר, מיקה, שמנים מיוחדים…)</span>${lines(2)}</div>
 ${prefilled("טכניקה / עיצוב", technique || d.technique || "", 2)}
-<div class="field"><span class="lbl">מה מיוחד בסבון הזה — במילים שלך, כמה מילים מספיקות</span>${lines(3)}</div>
+${descHtml(desc)}
 <div class="field"><span class="lbl">למי ולמה מתאים — סמני ✓</span><div class="tags">${tagRows}</div></div>
 <div class="foot"><span class="ck">מוכן לפרסום</span><span class="ck">עוד לא</span><span class="lbl">הערות:</span><span class="fill"></span></div>
 <div class="pageno">${esc(ctx.today)} · ${ctx.i + 1} מתוך ${ctx.total}</div>`;
@@ -70,7 +83,8 @@ ${prefilled("טכניקה / עיצוב", technique || d.technique || "", 2)}
       .filter(Boolean).map(esc).join("<br>") || "עוד אין פרטים — הכל ממלאים כאן"}</div>
   </div>
 </div>
-${fieldsHtml(p, d, ctx, p.name_he ? "שם חדש (רק אם רוצים לשנות)" : "שם המוצר")}
+${fieldsHtml(p, d, ctx, p.name_he ? "שם חדש (רק אם רוצים לשנות)" : "שם המוצר", "",
+  (p.desc_he || "").trim() ? { text: p.desc_he.trim(), current: true } : { text: (d.desc_suggestion || "").trim(), current: false })}
 </section>`;
   }
 
@@ -89,7 +103,7 @@ ${fieldsHtml(p, d, ctx, p.name_he ? "שם חדש (רק אם רוצים לשנו�
     <div class="codes" dir="ltr">${codes.map(esc).join(" · ")}</div>
   </div>
 </div>
-${fieldsHtml({}, {}, ctx, "שם המוצר", techniquesOf(g.images))}
+${fieldsHtml({}, {}, ctx, "שם המוצר", techniquesOf(g.images), { text: suggestionOf(g.images), current: false })}
 </section>`;
   }
 
@@ -135,6 +149,8 @@ h2{font-family:"Frank Ruhl Libre",serif;font-weight:500;color:#163B30;margin:0;f
 .lbl{color:#163B30;font-weight:700;font-size:13px}
 .field{display:flex;flex-direction:column;gap:1mm}
 .ln{height:7mm;border-bottom:1px solid #9C9584}
+.lbl .note{font-weight:400;color:#5E675F;font-size:11px;margin-right:2mm}
+.sugg{font-size:11.5px;line-height:5mm;color:#8A6A2F;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-height:15mm;border-bottom:1px dashed #C9C0AE;padding-bottom:.5mm}
 .ln.pre{display:flex;align-items:flex-end;padding-bottom:.8mm;font-size:15px;color:#8A6A2F}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:3mm}
 .box{border:1px solid #9C9584;border-radius:2.5mm;min-height:12.5mm;padding:1.5mm 2.5mm;display:flex;flex-direction:column}
@@ -180,8 +196,8 @@ ${pages.join("\n")}
   }
 
   /* ---------- admin dialog ---------- */
-  function RSForms(sb, { getProducts, getInbox, toast, abs, tags }) {
-    let dlg = null, tab = "products", groups = [];
+  function RSForms(sb, { getProducts, getInbox, toast, abs, tags, settings }) {
+    let dlg = null, tab = "products", groups = [], batching = false, cancel = false;
     const newImages = () => (getInbox ? getInbox() : []).filter(m => m.status === "new");
     const grouped = () => new Set(groups.flatMap(g => g.images.map(m => m.id)));
     function build() {
@@ -213,6 +229,10 @@ ${pages.join("\n")}
         <button type="button" class="btn" id="formsGroupEach">טופס לכל תמונה</button>
       </div>
     </div>
+    <div class="forms-desc">
+      <button type="button" class="btn" id="formsDesc">הכנת תיאור מוצע לכל מה שחסר</button>
+      <span class="hint" id="formsDescMsg">לכל מוצר בלי תיאור ולכל תמונה חדשה מהסטודיו: ניתוח התמונה והצעת תיאור. ההצעה מודפסת בטופס ונשמרת בכרטיס — לא מתפרסמת באתר.</span>
+    </div>
     <label class="forms-legend"><input type="checkbox" id="formsLegend" checked> להוסיף דף מקרא עם קודי המתכונים והתבניות</label>
     <p class="hint">אחרי המילוי מצלמים את הדפים ושולחים, והפרטים נכנסים לכרטיסים כטיוטה. שום דבר לא מתפרסם לבד.</p>
   </div>
@@ -231,6 +251,8 @@ ${pages.join("\n")}
       dlg.querySelector("#formsGroupOne").onclick = () => makeGroups(false);
       dlg.querySelector("#formsGroupEach").onclick = () => makeGroups(true);
       dlg.querySelector("#formsGo").onclick = go;
+      dlg.querySelector("#formsDesc").onclick = describeAll;
+      dlg.addEventListener("close", () => { cancel = true; });
     }
     function checkedImages() {
       const ids = new Set(Array.from(dlg.querySelectorAll("#formsGrid input:checked")).map(i => i.value));
@@ -265,6 +287,7 @@ ${pages.join("\n")}
     }
     function open() {
       if (!dlg) build();
+      cancel = false;
       const items = getProducts();
       dlg.querySelector("#formsList").innerHTML = items.map(p => `<label class="forms-item">
   <input type="checkbox" value="${esc(p.id)}" data-pub="${p.published ? 1 : 0}" ${p.published ? "" : "checked"}>
@@ -275,6 +298,25 @@ ${pages.join("\n")}
       paint();
       dlg.showModal();
     }
+    async function describeAll() {
+      const btn = dlg.querySelector("#formsDesc"), msg = dlg.querySelector("#formsDescMsg");
+      if (batching) { cancel = true; btn.textContent = "עוצרים…"; return; }
+      if (!root.RSDescribeBatch) return toast("רכיב התיאורים לא נטען — רענני את הדף");
+      batching = true; cancel = false; btn.textContent = "עצירה"; msg.textContent = "בודקים מה חסר…";
+      try {
+        const products = getProducts();
+        const { data, error } = await sb.from("product_details").select("product_id,technique,photo_analysis,desc_suggestion");
+        if (error) throw error;
+        const details = {}; (data || []).forEach(x => { details[x.product_id] = x; });
+        const B = root.RSDescribeBatch(sb, { settings: settings || (() => ({})), abs });
+        const st = await B.run({ products, details, images: getInbox ? getInbox() : [], isCancelled: () => cancel,
+          onProgress: s => { msg.textContent = s.total ? `מכינים תיאורים: ${s.done} מתוך ${s.total}${s.failed ? ` · ${s.failed} לא הצליחו` : ""}. אפשר להמשיך לעבוד, רק לא לסגור את החלון.` : "לכל המוצרים והתמונות כבר יש תיאור או הצעה ✓"; } });
+        if (st.total) msg.textContent = st.stopped ? `נעצר אחרי ${st.done - st.failed} תיאורים: ${st.stopped}`
+          : cancel ? `נעצר. הוכנו ${st.done - st.failed} תיאורים. לחיצה נוספת ממשיכה מאיפה שעצרנו.`
+          : `הוכנו ${st.done - st.failed} תיאורים ✓${st.failed ? ` · ${st.failed} לא הצליחו — לחיצה נוספת תנסה שוב רק אותם` : ""}`;
+      } catch (e) { msg.textContent = "לא הצלחנו להכין תיאורים: " + (e.message || e); }
+      batching = false; btn.textContent = "הכנת תיאור מוצע לכל מה שחסר";
+    }
     async function go() {
       const ids = Array.from(dlg.querySelectorAll("#formsList input:checked")).map(i => i.value);
       if (!ids.length && !groups.length) return toast("לא נבחרו מוצרים או טפסים מתמונות");
@@ -283,7 +325,7 @@ ${pages.join("\n")}
       win.document.write(`<p dir="rtl" style="font-family:Arial;padding:24px">מכינים את הטפסים…</p>`); win.document.close();
       try {
         const [d, r, m] = await Promise.all([
-          ids.length ? sb.from("product_details").select("product_id,sku,recipe_id,mold_tool_id,unit_weight_g,tags,technique").in("product_id", ids) : Promise.resolve({ data: [] }),
+          ids.length ? sb.from("product_details").select("product_id,sku,recipe_id,mold_tool_id,unit_weight_g,tags,technique,desc_suggestion").in("product_id", ids) : Promise.resolve({ data: [] }),
           sb.from("recipes").select("id,name").order("id"),
           sb.from("molds_tools").select("id,name").eq("kind", "תבנית").order("id")
         ]);
@@ -303,6 +345,6 @@ ${pages.join("\n")}
     return { open };
   }
 
-  const api = { formsHtml, formCode, imageCode, groupCode, techniquesOf, RSForms };
+  const api = { formsHtml, formCode, imageCode, groupCode, techniquesOf, suggestionOf, RSForms };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else { root.RSForms = RSForms; root.RSFormsHtml = formsHtml; root.RSTechniquesOf = techniquesOf; }
 })(typeof window !== "undefined" ? window : globalThis);

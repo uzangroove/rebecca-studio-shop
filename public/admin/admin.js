@@ -244,17 +244,20 @@
     S.pendingInbox = [];
     $("#prodDlg").close(); toast(row.published ? "נשמר ✓" : "נשמר ✓ (מוסתר באתר עד שתסמני \"מוצג באתר\")"); loadProducts(); loadInbox();
   };
-  // הטכניקה שרבקה כתבה בסטודיו התמונות נכנסת לכרטיס המוצר — רק אם השדה עוד ריק.
+  // מה שכבר ידוע על תמונות מהסטודיו נכנס לכרטיס המוצר — רק אם עוד ריק:
+  // הטכניקה שרבקה כתבה בסטודיו, והתיאור המוצע שהוכן לפני הדפסת הטפסים (הצעה בלבד, לא התיאור שבאתר).
   function fillTechnique(inboxIds) {
-    const el = $("#stTechnique"); if (!el || el.value.trim() || !window.RSTechniquesOf) return;
-    const ids = new Set(inboxIds);
-    el.value = window.RSTechniquesOf(S.inbox.filter(m => ids.has(m.id))).slice(0, 200);
+    const ids = new Set(inboxIds), imgs = S.inbox.filter(m => ids.has(m.id));
+    const el = $("#stTechnique");
+    if (el && !el.value.trim() && window.RSTechniquesOf) el.value = window.RSTechniquesOf(imgs).slice(0, 200);
+    const sug = imgs.map(m => m.meta && m.meta.desc_suggestion).find(Boolean);
+    if (ST && sug && !(ST.getExtra() || {}).desc_suggestion) { ST.setExtra({ desc_suggestion: sug }); if (SG) SG.loaded(); }
   }
   $("#newProduct").onclick = () => openProduct(null);
   let FORMS = null;
   $("#printForms").onclick = () => {
     if (!window.RSForms) return toast("רכיב הטפסים לא נטען — רענני את הדף");
-    if (!FORMS) FORMS = window.RSForms(sb, { getProducts: () => S.products || [], getInbox: () => S.inbox || [], toast, abs, tags: (ST && ST.TAGS) || {} });
+    if (!FORMS) FORMS = window.RSForms(sb, { getProducts: () => S.products || [], getInbox: () => S.inbox || [], toast, abs, tags: (ST && ST.TAGS) || {}, settings: () => S.settings || {} });
     FORMS.open();
   };
   $("#prodDelete").onclick = async () => {
@@ -335,12 +338,15 @@
   }
   $("#assignSearch").oninput = renderAssign;
   async function keepTechnique(pid, m) {
-    const t = window.RSTechniquesOf ? window.RSTechniquesOf([m]).slice(0, 200) : "";
-    if (!t) return;
-    const { data, error } = await sb.from("product_details").select("technique").eq("product_id", pid).maybeSingle();
+    const meta = m.meta || {};
+    const add = { technique: window.RSTechniquesOf ? window.RSTechniquesOf([m]).slice(0, 200) : "", desc_suggestion: String(meta.desc_suggestion || "").trim() };
+    if (!add.technique && !add.desc_suggestion) return;
+    const { data, error } = await sb.from("product_details").select("technique,desc_suggestion").eq("product_id", pid).maybeSingle();
     if (error) return console.warn(error);
-    if (data && data.technique) return; // כבר כתוב — לא דורסים
-    const q = data ? sb.from("product_details").update({ technique: t }).eq("product_id", pid) : sb.from("product_details").insert({ product_id: pid, technique: t });
+    const patch = {}; // רק שדות ריקים — מה שכבר כתוב לא נדרס
+    for (const k of ["technique", "desc_suggestion"]) if (add[k] && !(data && data[k])) patch[k] = add[k];
+    if (!Object.keys(patch).length) return;
+    const q = data ? sb.from("product_details").update(patch).eq("product_id", pid) : sb.from("product_details").insert({ product_id: pid, ...patch });
     const { error: e2 } = await q; if (e2) console.warn(e2);
   }
   async function doAssign(pid) {

@@ -96,18 +96,28 @@ window.RSSuggest = function (sb, { $, esc, toast, images, settings, studio, abs 
     if (c) c.onclick = async () => { try { await navigator.clipboard.writeText(tags.join(" ")); toast("ההאשטגים הועתקו"); } catch (e) { prompt("", tags.join(" ")); } };
   }
 
+  /* ---------- a description suggestion prepared before printing the forms ---------- */
+  function showSuggestion(text) {
+    const box = $("#sgSuggestDesc"); text = String(text || "").trim();
+    box.hidden = !text; if (!text) { box.innerHTML = ""; return; }
+    box.innerHTML = `<div><b>תיאור מוצע (מניתוח התמונה):</b> ${esc(text)}</div><button type="button" class="chip" id="sgUseDesc">להכניס לתיאור</button>`;
+    $("#sgUseDesc").onclick = () => { form().desc_he.value = text; toast("ההצעה הוכנסה לתיאור — אפשר לערוך לפני השמירה"); };
+  }
+
   /* ---------- reset per product ---------- */
   function reset() {
     S.names = []; S.shown = []; S.chosen = -1; S.desc = null;
     $("#sgNamesBox").innerHTML = ""; $("#sgMore").hidden = true; $("#sgAnalysis").hidden = true; $("#sgAnalysis").innerHTML = "";
     setStatus(base() ? "" : "כדי להפעיל את ההצעות, צריך להדביק בהגדרות את כתובת סטודיו התמונות.", !base());
     $("#sgTags").hidden = true; $("#sgTags").innerHTML = "";
+    $("#sgSuggestDesc").hidden = true; $("#sgSuggestDesc").innerHTML = "";
     busy(false);
   }
   // after the production details load: show what was saved before (search words, hashtags, photo analysis)
   function loaded() {
     const x = studio && studio.getExtra(); if (!x) return;
     if ((x.hashtags && x.hashtags.length) || (x.seo_keywords && x.seo_keywords.length) || x.meta_description) renderTags(x);
+    showSuggestion(x.desc_suggestion);
     const a = x.photo_analysis;
     if (a) { const box = $("#sgAnalysis"); box.hidden = false; box.innerHTML = [["סוג", a.type], ["צבעים", (a.colors || []).join(", ")], ["צורה", a.shape], ["טכניקה", a.technique], ["הערה", a.notes]].filter(([, v]) => v).map(([k, v]) => `<div><b>${esc(k)}:</b> ${esc(v)}</div>`).join(""); }
   }

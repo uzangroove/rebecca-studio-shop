@@ -64,7 +64,7 @@ window.RSStudio = function (sb, { $, $$, esc, toast }) {
         $("#stWeight").value = v.unit_weight_g || ""; $("#stFree").value = v.free_text || ""; $("#stTechnique").value = v.technique || ""; $("#stStatus").value = v.status || "טיוטה";
         st.tags = JSON.parse(JSON.stringify(v.tags || {})); st.lead = v.lead_material_id || null; st.leadAuto = !st.lead;
         const r = D.recipes[v.recipe_id]; st.recipeMats = r ? r.lines.map(x => x[0]) : [];
-        st.extra = { name_short: v.name_short || null, seo_keywords: v.seo_keywords || [], hashtags: v.hashtags || [], meta_description: v.meta_description || null, photo_analysis: v.photo_analysis || null };
+        st.extra = { name_short: v.name_short || null, seo_keywords: v.seo_keywords || [], hashtags: v.hashtags || [], meta_description: v.meta_description || null, photo_analysis: v.photo_analysis || null, desc_suggestion: v.desc_suggestion || null };
       }
       if (pm.data) { st.mats = pm.data.map(x => x.material_id).filter(id => D.byId[id]); const ld = pm.data.find(x => x.is_lead); if (ld) st.lead = ld.material_id; }
     }
