@@ -232,6 +232,7 @@
           </div>
           <p class="sg-status" id="sgStatus" role="status"></p>
           <div class="sg-analysis" id="sgAnalysis" hidden></div>
+          <div class="sg-analysis" id="sgSuggestDesc" hidden></div>
           <div class="sg-names" id="sgNamesBox"></div>
           <div class="sg-tags" id="sgTags" hidden></div>
         </fieldset>
@@ -273,6 +274,7 @@
               <label>סטטוס פנימי<select id="stStatus"><option>טיוטה</option><option>מאושר</option><option>באתר</option><option>לא למכירה</option></select></label>
             </div>
             <div class="st-cost" id="stCost"></div>
+            <label>טכניקה / עיצוב<input id="stTechnique" maxlength="200"></label>
             <label>במילים של רבקה (הערות חופשיות)<textarea id="stFree" rows="3" maxlength="4000"></textarea></label>
           </div>
         </details>
@@ -415,13 +417,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/js/config.js?v=20261011d"></script>
   <script src="/assets/js/product-facts.js?v=20261105a"></script>
-  <script src="/admin/studio.js?v=20261105a"></script>
-  <script src="/admin/forms.js?v=20261105b"></script>
-  <script src="/admin/suggest.js?v=20261017a"></script>
+  <script src="/admin/studio.js?v=20261113b"></script>
+  <script src="/admin/describe-batch.js?v=20261113a"></script>
+  <script src="/admin/forms.js?v=20261113b"></script>
+  <script src="/admin/suggest.js?v=20261113a"></script>
   <script src="/admin/soapcalc.js?v=20261017a"></script>
   <script src="/admin/calcui.js?v=20261017a"></script>
   <script src="/admin/data.js?v=20261017a"></script>
-  <script src="/admin/admin.js?v=20261105a"></script>
+  <script src="/admin/admin.js?v=20261113b"></script>
   <script src="/admin/ui.js?v=20261017a"></script>
 </body>
 </html>
